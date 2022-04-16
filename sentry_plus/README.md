@@ -1,5 +1,7 @@
 # Sentry Plus
 
+> Please note, that this code isn't fully unit tested, but it should already work quite well.
+
 This package includes a collection of community maintained integrations for Sentry.
 
 ## File tracing
