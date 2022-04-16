@@ -1,0 +1,17 @@
+name: sentry_link
+description: A starting point for Dart libraries or applications.
+version: 1.0.0
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  gql_error_link: ^0.2.0
+  gql_exec: ^0.3.0
+  gql_link: ^0.4.0
+  sentry: ^6.3.0
+
+dev_dependencies:
+  lints: ^1.0.0
+  test: ^1.16.0
