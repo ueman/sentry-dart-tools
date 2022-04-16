@@ -29,11 +29,16 @@ void executeProgramm() async {
     HttpClientRequest request = await client.get('flutter.dev', 80, '/');
 
     HttpClientResponse response = await request.close();
-    final stringData = await response.transform(utf8.decoder).join();
+    final stringData =
+        await response.transform(utf8.decoder.wrapWithTraces()).join();
     print(stringData);
   } finally {
     client.close();
   }
+
+  final List<int> data = [/* ...*/];
+  final decoder = utf8.decoder.wrapWithTraces();
+  final converted = decoder.convert(data);
 
   print('finished http request');
   print('starting writing files');

@@ -11,6 +11,23 @@ It includes traces for reading, writing, modifying and deleting files.
 
 This is only available on non-web platforms.
 
+```dart
+import 'package:sentry_plus/sentry_plus.dart';
+
+Future<void> main() {
+  return Sentry.init(
+    (options) {
+      // Add tracing for files
+      options.addFileTracing();
+      // other configuration omitted
+    },
+    appRunner: () {
+        // app code
+    },
+  );
+}
+```
+
 ## HTTP tracing
 
 Enable automatic creation of performance traces for HTTP requests for `dart:io` platforms.
@@ -23,22 +40,33 @@ This is only available on non-web platforms.
 Remarks: 
 Make sure to disable performance tracing for the `http` or `dio` packages, if you're using them. Otherwise you're creating two traces for the same request.
 
-## Getting started
-
-Follow the guidelines from the official Sentry package for Dart or Flutter
-and then add the following:
-
 ```dart
+import 'package:sentry_plus/sentry_plus.dart';
+
 Future<void> main() {
   return Sentry.init(
     (options) {
-      options.dsn = '<your DSN here>';
-      options.addFileTracing();
+      // Add tracing for http
       options.addHttpTracing();
+      // other configuration omitted
     },
     appRunner: () {
         // app code
     },
   );
 }
+```
+
+## `dart:convert`
+
+This repo includes some utilities to make it easier to add performance traces
+for conversion done by `dart:convert`.
+
+```dart
+import 'package:sentry_plus/sentry_plus.dart';
+
+final List<int> data = [/* ...*/];
+// call the extension method `wrapWithTraces()` on a codec or converter
+final decoder = utf8.decoder.wrapWithTraces();
+final converted = decoder.convert(data);
 ```
