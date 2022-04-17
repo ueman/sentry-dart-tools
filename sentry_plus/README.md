@@ -1,7 +1,5 @@
 # Sentry Plus
 
-> Please note, that this code isn't fully unit tested, but it should already work quite well.
-
 This package includes a collection of community maintained integrations for Sentry.
 
 ## File tracing
@@ -70,3 +68,13 @@ final List<int> data = [/* ...*/];
 final decoder = utf8.decoder.wrapWithTraces();
 final converted = decoder.convert(data);
 ```
+
+## Design & support philosophy
+
+This code differs from Sentrys design and support philosophy:
+- This code doesn't try to be as backwards compatible as possible. This enables this code to make use of newer features.
+- This code doesn't try to stay free of dependencies. Low quality dependencies are still not allowed, though.
+- This code has no guarantees for API stability
+- Code is not supported by Sentry
+- When comparable features are implemented in (or moved to) Sentry, it will be removed from this package.
+- Features & integrations should be easy to integrate and use
