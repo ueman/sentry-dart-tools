@@ -2,6 +2,27 @@
 
 This package includes a collection of community maintained integrations for Sentry.
 
+# Automatic integrations
+
+## Add all automatic integrations
+
+```dart
+import 'package:sentry_plus/sentry_plus.dart';
+
+Future<void> main() {
+  // also works for SentryFlutter.init
+  return Sentry.init(
+    (options) {
+      options.addSentryPlus();
+      // other configuration omitted
+    },
+    appRunner: () {
+        // app code
+    },
+  );
+}
+```
+
 ## File tracing
 
 This enables automatic creation of performance traces for most file IO.
@@ -13,6 +34,7 @@ This is only available on non-web platforms.
 import 'package:sentry_plus/sentry_plus.dart';
 
 Future<void> main() {
+  // also works for SentryFlutter.init
   return Sentry.init(
     (options) {
       // Add tracing for files
@@ -42,6 +64,7 @@ Make sure to disable performance tracing for the `http` or `dio` packages, if yo
 import 'package:sentry_plus/sentry_plus.dart';
 
 Future<void> main() {
+  // also works for SentryFlutter.init
   return Sentry.init(
     (options) {
       // Add tracing for http
@@ -54,6 +77,30 @@ Future<void> main() {
   );
 }
 ```
+
+## `UnhandledEventProcessor`
+
+This event processor marks all exceptions caught by Sentry as `unhandled:  true`. This kinda goes against Sentrys typical usage of it, as `unhandled:  true` means that the application did a hard crash, which Flutter applications
+typically don't do.
+
+```dart
+import 'package:sentry_plus/sentry_plus.dart';
+
+Future<void> main() {
+  // also works for SentryFlutter.init
+  return Sentry.init(
+    (options) {
+      options.addEventProcessor(UnhandledEventProcessor());
+      // other configuration omitted
+    },
+    appRunner: () {
+        // app code
+    },
+  );
+}
+```
+
+# Manual integrations
 
 ## `dart:convert`
 

@@ -13,6 +13,7 @@ Future<void> main() {
       options.tracesSampleRate = 1;
       options.addFileTracing();
       options.addHttpTracing();
+      options.addEventProcessor(UnhandledEventProcessor());
     },
     appRunner: executeProgramm,
   );
