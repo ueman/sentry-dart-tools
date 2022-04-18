@@ -29,6 +29,7 @@ class SentryLink {
   }
 }
 
+// See https://github.com/gql-dart/gql/blob/master/links/gql_error_link/lib/gql_error_link.dart
 class SentryLinkHandler {
   const SentryLinkHandler({
     required this.hub,
@@ -50,7 +51,7 @@ class SentryLinkHandler {
     Request request,
     NextLink forward,
     Response response,
-  ) {
+  ) async* {
     if (reportGraphQlErrorsAsBreadcrumbs) {
       hub.addBreadcrumb(Breadcrumb(
         level: SentryLevel.error,
@@ -61,32 +62,27 @@ class SentryLinkHandler {
           'response': response.toJson(),
         },
       ));
-    } else {
-      if (reportGraphQLErrors) {
-        hub.captureEvent(
-          SentryEvent(
-            message: SentryMessage('GraphQL Error'),
-            level: SentryLevel.error,
-            extra: {
+    } else if (reportGraphQLErrors) {
+      await hub.captureEvent(
+        SentryEvent(
+          message: SentryMessage('GraphQL Error'),
+          level: SentryLevel.error,
+          contexts: Contexts()
+            ..['GraphQL'] = <String, dynamic>{
               'request': request.toJson(),
               'response': response.toJson(),
             },
-          ),
-          withScope: (scope) {
-            scope.extra['graphQlRequest'] = request.toJson();
-          },
-        );
-      }
+        ),
+      );
     }
-
-    return null;
+    yield response;
   }
 
   Stream<Response>? onException(
     Request request,
     NextLink forward,
     LinkException exception,
-  ) {
+  ) async* {
     if (reportExceptionsAsBreadcrumbs) {
       hub.addBreadcrumb(Breadcrumb(
         message: exception.toString(),
@@ -95,16 +91,16 @@ class SentryLinkHandler {
         type: 'error',
         data: request.toJson(),
       ));
-    } else {
-      if (reportExceptions) {
-        hub.captureException(
-          exception,
-          withScope: (scope) {
-            scope.extra['graphQlRequest'] = request.toJson();
-          },
-        );
-      }
+    } else if (reportExceptions) {
+      await hub.captureException(
+        exception,
+        withScope: (scope) {
+          scope.contexts['GraphQL'] = <String, dynamic>{
+            'request': request.toJson(),
+          };
+        },
+      );
     }
-    return null;
+    yield* Stream.error(exception);
   }
 }

@@ -68,37 +68,3 @@ extension OperationX on Operation {
     };
   }
 }
-
-extension FooBar on GraphQLError {
-  SentryException toSentryException() {
-    final frames = locations
-        ?.map(
-          (e) => SentryStackFrame(
-            colNo: e.column,
-            lineNo: e.line,
-            rawFunction: path?.join('.'),
-            inApp: true,
-            vars: Map.fromEntries(
-              extensions?.entries.map(
-                    (e) => MapEntry<String, String>(
-                        e.key, e.value?.toString() ?? ''),
-                  ) ??
-                  [],
-            ),
-          ),
-        )
-        .toList(growable: false);
-
-    SentryStackTrace? stackTrace;
-    if (frames != null) {
-      stackTrace = SentryStackTrace(
-        frames: frames,
-      );
-    }
-    return SentryException(
-      type: 'GraphQL Error',
-      value: message,
-      stackTrace: stackTrace,
-    );
-  }
-}
