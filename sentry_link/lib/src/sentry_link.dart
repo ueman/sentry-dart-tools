@@ -4,7 +4,9 @@ import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
 import 'extension.dart';
 
+/// Provides a `Link` which captures exceptions and GraphQL errors
 class SentryLink {
+  /// Provides a `Link` which captures exceptions and GraphQL errors
   static ErrorLink link({
     Hub? hub,
     bool reportExceptions = true,
