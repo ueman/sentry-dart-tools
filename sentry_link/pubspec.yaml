@@ -1,7 +1,8 @@
 name: sentry_link
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
-# homepage: https://www.example.com
+description: Automatic capture of exceptions and GraphQL errors for the gql eco-system, like graphql and ferry
+version: 0.0.1
+repository: https://github.com/ueman/sentry-dart-tools
+issue_tracker: https://github.com/ueman/sentry-dart-tools/issues
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -10,7 +11,8 @@ dependencies:
   gql_error_link: ^0.2.0
   gql_exec: ^0.3.0
   gql_link: ^0.4.0
-  sentry: ^6.5.0-0
+  gql: ^0.13.0
+  sentry: ^6.4.0
 
 dev_dependencies:
   lints: ^1.0.0
