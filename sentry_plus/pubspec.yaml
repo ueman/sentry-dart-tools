@@ -1,6 +1,6 @@
 name: sentry_plus
-description: A collection of community maintained Sentry integrations.
-version: 0.0.1
+description: This package includes a collection of community maintained integrations for Sentry.
+version: 0.0.2
 repository: https://github.com/ueman/sentry-dart-tools
 issue_tracker: https://github.com/ueman/sentry-dart-tools/issues
 

@@ -194,4 +194,41 @@ class SentryIoHttpClient implements HttpClient {
   Future<HttpClientRequest> putUrl(Uri url) => _openUrl('put', url);
 
   // coverage:ignore-end
+
+  @override
+  // This is an override on Flutter 2.8 and later
+  // ignore: override_on_non_overriding_member
+  set connectionFactory(
+      Future<ConnectionTask<Socket>> Function(
+              Uri url, String? proxyHost, int? proxyPort)?
+          f) {
+    try {
+      (_innerClient as dynamic).connectionFactory = f;
+    } on NoSuchMethodError catch (_) {
+      // The clear method exists as of Dart 2.17.0
+      // Previous versions don't have it, but later versions do.
+      // We can't use `extends` in order to provide this method because this is
+      // a wrapper and thus the method call must be forwarded.
+      // On Dart versions before 2.17 we can't forward this call and
+      // just catch the error which is thrown. On later version the call gets
+      // correctly forwarded.
+    }
+  }
+
+  @override
+  // This is an override on Flutter 2.8 and later
+  // ignore: override_on_non_overriding_member
+  set keyLog(Function(String line)? callback) {
+    try {
+      (_innerClient as dynamic).keyLog = callback;
+    } on NoSuchMethodError catch (_) {
+      // The clear method exists as of Dart 2.17.0
+      // Previous versions don't have it, but later versions do.
+      // We can't use `extends` in order to provide this method because this is
+      // a wrapper and thus the method call must be forwarded.
+      // On Dart versions before 2.17 we can't forward this call and
+      // just catch the error which is thrown. On later version the call gets
+      // correctly forwarded.
+    }
+  }
 }
