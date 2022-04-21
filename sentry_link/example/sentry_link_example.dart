@@ -29,15 +29,16 @@ Future<void> example() async {
   );
 
   final QueryOptions options = QueryOptions(
+    operationName: 'ReadRepositories',
     document: gql(
       r'''
         query ReadRepositories($nRepositories: Int!) {
           viewer {
             repositories(last: $nRepositories) {
               nodes {
-                __typename
                 id
-                name
+                # this one is intentionally wrong, the last char 'e' is missing
+                nam
                 # this one is intentionally wrong, the last char 'd' is missing
                 viewerHasStarre
               }

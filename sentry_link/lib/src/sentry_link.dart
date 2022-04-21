@@ -54,6 +54,11 @@ class SentryLinkHandler {
     NextLink forward,
     Response response,
   ) async* {
+    final errors = response.errors;
+    if (errors == null) {
+      yield response;
+      return;
+    }
     if (reportGraphQlErrorsAsBreadcrumbs) {
       hub.addBreadcrumb(Breadcrumb(
         level: SentryLevel.error,
@@ -65,17 +70,29 @@ class SentryLinkHandler {
         },
       ));
     } else if (reportGraphQLErrors) {
-      await hub.captureEvent(
-        SentryEvent(
-          message: SentryMessage('GraphQL Error'),
-          level: SentryLevel.error,
-          contexts: Contexts()
-            ..['GraphQL'] = <String, dynamic>{
-              'request': request.toJson(),
-              'response': response.toJson(),
-            },
-        ),
-      );
+      final exceptions = errors.toSentryExceptions(request, response);
+      if (exceptions.isNotEmpty) {
+        // try to format it nicely
+        await hub.captureEvent(
+          SentryEvent(
+            exceptions: response.errors?.toSentryExceptions(request, response),
+            level: SentryLevel.error,
+          ),
+        );
+      } else {
+        // we couldn't format it nicely
+        await hub.captureEvent(
+          SentryEvent(
+            exceptions: response.errors?.toSentryExceptions(request, response),
+            level: SentryLevel.error,
+            contexts: Contexts()
+              ..['GraphQL'] = <String, dynamic>{
+                'request': request.toJson(),
+                'response': response.toJson(),
+              },
+          ),
+        );
+      }
     }
     yield response;
   }
