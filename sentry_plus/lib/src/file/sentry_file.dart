@@ -140,7 +140,15 @@ class SentryFile implements File {
     Encoding encoding = utf8,
     bool flush = false,
   }) {
-    return _wrap(_file.writeAsString(contents), 'file.write');
+    return _wrap(
+      _file.writeAsString(
+        contents,
+        mode: mode,
+        encoding: encoding,
+        flush: flush,
+      ),
+      'file.write',
+    );
   }
 
   @override
