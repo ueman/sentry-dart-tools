@@ -13,7 +13,11 @@ class SentryIoHttpClient implements HttpClient {
 
   final HttpClient _innerClient;
 
-  SentryIoHttpClient(this._options, this._hub, this._innerClient);
+  late Dsn dsn;
+
+  SentryIoHttpClient(this._options, this._hub, this._innerClient) {
+    dsn = Dsn.parse(_options.dsn!);
+  }
 
   @override
   Future<HttpClientRequest> open(
@@ -41,34 +45,46 @@ class SentryIoHttpClient implements HttpClient {
       query = path.substring(queryStart + 1, fragmentStart);
       path = path.substring(0, queryStart);
     }
-    final uri =
-        Uri(scheme: 'http', host: host, port: port, path: path, query: query);
+    final uri = Uri(
+      scheme: 'http',
+      host: host,
+      port: port,
+      path: path,
+      query: query,
+    );
     return _openUrl(method, uri);
   }
 
   Future<HttpClientRequest> _openUrl(String method, Uri url) async {
-    // ignore: todo
-    // TODO Don't track calls to Sentry itself
-    final currentSpan = _hub.getSpan();
-    if (currentSpan == null) {
-      // no wrapping if no span is active
-      return _innerClient.openUrl(method, url);
+    ISentrySpan? span;
+
+    if (url.toString().contains(dsn.postUri.toString())) {
+      // Only trace HTTP request if it's not requesting Sentry
+      final currentSpan = _hub.getSpan();
+      span = currentSpan?.startChild(
+        'http.client',
+        description: '$method $url',
+      );
     }
 
-    final span = currentSpan.startChild(
-      'http.client',
-      description: '$method $url',
-    );
+    final stopwatch = Stopwatch()..start();
     try {
       final request = await _innerClient.openUrl(method, url);
-      final traceHeader = span.toSentryTrace();
-      request.headers.add(traceHeader.name, traceHeader.value);
-      return SentryHttpRequest(span, request);
+      if (span != null) {
+        final traceHeader = span.toSentryTrace();
+        request.headers.add(traceHeader.name, traceHeader.value);
+      }
+      return SentryHttpRequest(
+        span,
+        request,
+        _hub,
+        stopwatch,
+      );
     } catch (e) {
-      span.throwable = e;
+      span?.throwable = e;
       rethrow;
     } finally {
-      await span.finish();
+      await span?.finish();
     }
   }
 
@@ -196,7 +212,6 @@ class SentryIoHttpClient implements HttpClient {
   // coverage:ignore-end
 
   @override
-  // This is an override on Flutter 2.8 and later
   // ignore: override_on_non_overriding_member
   set connectionFactory(
       Future<ConnectionTask<Socket>> Function(
@@ -216,7 +231,6 @@ class SentryIoHttpClient implements HttpClient {
   }
 
   @override
-  // This is an override on Flutter 2.8 and later
   // ignore: override_on_non_overriding_member
   set keyLog(Function(String line)? callback) {
     try {

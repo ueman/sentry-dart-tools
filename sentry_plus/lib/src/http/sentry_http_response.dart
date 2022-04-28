@@ -6,14 +6,27 @@ import 'package:sentry/sentry.dart';
 class SentryHttpResponse extends Stream<List<int>>
     implements HttpClientResponse {
   final HttpClientResponse _innerResponse;
-  final ISentrySpan _span;
+  final ISentrySpan? _span;
+  final Hub _hub;
+  final Uri _url;
+  final String _method;
+  final Stopwatch _stopwatch;
 
   Object? lastError;
 
-  SentryHttpResponse(
-    this._span,
-    this._innerResponse,
-  );
+  SentryHttpResponse({
+    required ISentrySpan? span,
+    required HttpClientResponse innerResponse,
+    required Hub hub,
+    required Uri url,
+    required String method,
+    required Stopwatch stopwatch,
+  })  : _hub = hub,
+        _innerResponse = innerResponse,
+        _span = span,
+        _url = url,
+        _method = method,
+        _stopwatch = stopwatch;
 
   @override
   StreamSubscription<List<int>> listen(
@@ -50,12 +63,21 @@ class SentryHttpResponse extends Stream<List<int>>
   // error will be sent.
   void _onError(Object error, StackTrace? stackTrace) {
     lastError = error;
-    _span.throwable = error;
+    _span?.throwable = error;
   }
 
   void _onFinish() {
     final statusCode = _innerResponse.statusCode;
-    unawaited(_span.finish(status: SpanStatus.fromHttpStatusCode(statusCode)));
+    _stopwatch.stop;
+    unawaited(_span?.finish(status: SpanStatus.fromHttpStatusCode(statusCode)));
+    _hub.addBreadcrumb(Breadcrumb.http(
+      url: _url,
+      method: _method,
+      reason: reasonPhrase,
+      statusCode: statusCode,
+      responseBodySize: contentLength,
+      requestDuration: _stopwatch.elapsed,
+    ));
   }
 
   // coverage:ignore-start

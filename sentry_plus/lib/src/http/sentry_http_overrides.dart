@@ -13,9 +13,6 @@ class SentryHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     var innerClient = super.createHttpClient(context);
-    if (!_options.isTracingEnabled()) {
-      return innerClient;
-    }
     return SentryIoHttpClient(_options, _hub, innerClient);
   }
 }
