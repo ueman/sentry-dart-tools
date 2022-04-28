@@ -14,6 +14,7 @@ Future<void> main() {
       options.addFileTracing();
       options.addHttpTracing();
       options.addEventProcessor(UnhandledEventProcessor());
+      options.addAutomaticInApp();
     },
     appRunner: executeProgramm,
   );
