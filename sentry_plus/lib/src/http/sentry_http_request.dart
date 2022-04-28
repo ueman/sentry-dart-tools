@@ -7,30 +7,20 @@ import 'sentry_http_response.dart';
 
 class SentryHttpRequest implements HttpClientRequest {
   final HttpClientRequest _innerRequest;
-  final ISentrySpan? _span;
-  final Hub _hub;
-  final Stopwatch _stopwatch;
+  final ISentrySpan _span;
 
   SentryHttpRequest(
     this._span,
     this._innerRequest,
-    this._hub,
-    this._stopwatch,
   );
 
   @override
   Future<HttpClientResponse> get done async {
     try {
-      final response = await _innerRequest.done;
-      return SentryHttpResponse(
-          span: _span,
-          innerResponse: response,
-          hub: _hub,
-          method: method,
-          url: uri,
-          stopwatch: _stopwatch);
+      final innerFuture = await _innerRequest.done;
+      return SentryHttpResponse(_span, innerFuture);
     } catch (e) {
-      _span?.throwable = e;
+      _span.throwable = e;
       rethrow;
     } finally {
       //  ???
@@ -41,16 +31,9 @@ class SentryHttpRequest implements HttpClientRequest {
   Future<HttpClientResponse> close() async {
     try {
       final response = await _innerRequest.close();
-      return SentryHttpResponse(
-        span: _span,
-        innerResponse: response,
-        hub: _hub,
-        method: method,
-        stopwatch: _stopwatch,
-        url: uri,
-      );
+      return SentryHttpResponse(_span, response);
     } catch (e) {
-      _span?.throwable = e;
+      _span.throwable = e;
       rethrow;
     } finally {
       //  ???
