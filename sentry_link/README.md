@@ -13,3 +13,6 @@ final link = Link.from([
     HttpLink('https://api.github.com/graphql'),
 ]);
 ```
+
+A GraphQL error will be reported like the following screenshot: 
+<img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
