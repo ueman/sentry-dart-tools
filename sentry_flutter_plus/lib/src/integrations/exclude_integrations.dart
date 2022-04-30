@@ -3,18 +3,19 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-class InAppIntegration implements Integration {
+class ExcludeIntegration implements Integration<SentryFlutterOptions> {
   @override
-  FutureOr<void> call(Hub hub, SentryOptions options) {
+  FutureOr<void> call(Hub hub, SentryFlutterOptions options) {
     // _addInAppExcludes can take a while, so we don't await it,
     // in order to no artificially increase the startup time.
     unawaited(_addInAppExcludes(options));
+    options.sdk.addIntegration('InAppIntegration');
   }
 
   @override
   FutureOr<void> close() {}
 
-  Future<void> _addInAppExcludes(SentryOptions options) async {
+  Future<void> _addInAppExcludes(SentryFlutterOptions options) async {
     final packages = await _getPackages();
     packages.forEach(options.addInAppExclude);
   }
