@@ -14,7 +14,6 @@ class LinuxEventProcessor implements EventProcessor {
   @override
   FutureOr<SentryEvent?> apply(SentryEvent event, {dynamic hint}) async {
     if (!_options.platformChecker.platform.isLinux) {
-      // At the time of writing, these are Android, iOS, macOS
       return event;
     }
     final linuxInfo = await _deviceInfo.linuxInfo;

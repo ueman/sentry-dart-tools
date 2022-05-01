@@ -14,7 +14,6 @@ class WindowsEventProcessor implements EventProcessor {
   @override
   FutureOr<SentryEvent?> apply(SentryEvent event, {dynamic hint}) async {
     if (!_options.platformChecker.platform.isWindows) {
-      // At the time of writing, these are Android, iOS, macOS
       return event;
     }
     final windowsInfo = await _deviceInfo.windowsInfo;
