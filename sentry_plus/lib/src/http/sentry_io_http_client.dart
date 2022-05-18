@@ -15,40 +15,11 @@ class SentryIoHttpClient implements HttpClient {
 
   SentryIoHttpClient(this._options, this._hub, this._innerClient);
 
-  @override
-  Future<HttpClientRequest> open(
+  Future<HttpClientRequest> _wrap(
+    Future<HttpClientRequest> requestFuture,
     String method,
-    String host,
-    int port,
-    String path,
-  ) {
-    // Should be kept in sync with https://github.com/dart-lang/sdk/blob/main/sdk/lib/_http/http_impl.dart
-    const int hashMark = 0x23;
-    const int questionMark = 0x3f;
-    int fragmentStart = path.length;
-    int queryStart = path.length;
-    for (int i = path.length - 1; i >= 0; i--) {
-      var char = path.codeUnitAt(i);
-      if (char == hashMark) {
-        fragmentStart = i;
-        queryStart = i;
-      } else if (char == questionMark) {
-        queryStart = i;
-      }
-    }
-    String? query;
-    if (queryStart < fragmentStart) {
-      query = path.substring(queryStart + 1, fragmentStart);
-      path = path.substring(0, queryStart);
-    }
-    final uri =
-        Uri(scheme: 'http', host: host, port: port, path: path, query: query);
-    return _openUrl(method, uri);
-  }
-
-  Future<HttpClientRequest> _openUrl(String method, Uri url) async {
-    // ignore: todo
-    // TODO Don't track calls to Sentry itself
+    Uri url,
+  ) async {
     final currentSpan = _hub.getSpan();
     if (currentSpan == null) {
       // no wrapping if no span is active
@@ -60,7 +31,7 @@ class SentryIoHttpClient implements HttpClient {
       description: '$method $url',
     );
     try {
-      final request = await _innerClient.openUrl(method, url);
+      final request = await requestFuture;
       final traceHeader = span.toSentryTrace();
       request.headers.add(traceHeader.name, traceHeader.value);
       return SentryHttpRequest(span, request);
@@ -142,56 +113,89 @@ class SentryIoHttpClient implements HttpClient {
       _innerClient.badCertificateCallback = callback;
 
   @override
-  void close({bool force = false}) => _innerClient.close(force: force);
-
-  @override
-  Future<HttpClientRequest> delete(String host, int port, String path) =>
-      open('delete', host, port, path);
-
-  @override
-  Future<HttpClientRequest> deleteUrl(Uri url) => _openUrl('delete', url);
-
-  @override
   set findProxy(String Function(Uri url)? f) => _innerClient.findProxy = f;
 
   @override
-  Future<HttpClientRequest> get(String host, int port, String path) =>
-      open('get', host, port, path);
+  void close({bool force = false}) => _innerClient.close(force: force);
 
   @override
-  Future<HttpClientRequest> getUrl(Uri url) => _openUrl('get', url);
+  Future<HttpClientRequest> open(
+          String method, String host, int port, String path) =>
+      _wrap(
+        _innerClient.open(method, host, port, path),
+        method,
+        Uri(host: host, port: port, path: path),
+      );
 
   @override
-  Future<HttpClientRequest> head(String host, int port, String path) =>
-      open('head', host, port, path);
+  Future<HttpClientRequest> delete(String host, int port, String path) => _wrap(
+        _innerClient.delete(host, port, path),
+        'delete',
+        Uri(host: host, port: port, path: path),
+      );
 
   @override
-  Future<HttpClientRequest> headUrl(Uri url) => _openUrl('head', url);
+  Future<HttpClientRequest> get(String host, int port, String path) => _wrap(
+        _innerClient.get(host, port, path),
+        'get',
+        Uri(host: host, port: port, path: path),
+      );
+
+  @override
+  Future<HttpClientRequest> head(String host, int port, String path) => _wrap(
+        _innerClient.head(host, port, path),
+        'head',
+        Uri(host: host, port: port, path: path),
+      );
+
+  @override
+  Future<HttpClientRequest> patch(String host, int port, String path) => _wrap(
+        _innerClient.patch(host, port, path),
+        'patch',
+        Uri(host: host, port: port, path: path),
+      );
+
+  @override
+  Future<HttpClientRequest> post(String host, int port, String path) => _wrap(
+        _innerClient.post(host, port, path),
+        'post',
+        Uri(host: host, port: port, path: path),
+      );
+
+  @override
+  Future<HttpClientRequest> put(String host, int port, String path) => _wrap(
+        _innerClient.put(host, port, path),
+        'put',
+        Uri(host: host, port: port, path: path),
+      );
+
+  @override
+  Future<HttpClientRequest> deleteUrl(Uri url) =>
+      _wrap(_innerClient.deleteUrl(url), 'delete', url);
+
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) =>
+      _wrap(_innerClient.getUrl(url), 'get', url);
+
+  @override
+  Future<HttpClientRequest> headUrl(Uri url) =>
+      _wrap(_innerClient.headUrl(url), 'head', url);
 
   @override
   Future<HttpClientRequest> openUrl(String method, Uri url) =>
-      _openUrl(method, url);
+      _wrap(_innerClient.openUrl(method, url), method, url);
 
   @override
-  Future<HttpClientRequest> patch(String host, int port, String path) =>
-      open('patch', host, port, path);
+  Future<HttpClientRequest> patchUrl(Uri url) =>
+      _wrap(_innerClient.patchUrl(url), 'patch', url);
 
   @override
-  Future<HttpClientRequest> patchUrl(Uri url) => _openUrl('patch', url);
+  Future<HttpClientRequest> postUrl(Uri url) =>
+      _wrap(_innerClient.postUrl(url), 'post', url);
 
   @override
-  Future<HttpClientRequest> post(String host, int port, String path) =>
-      open('post', host, port, path);
-
-  @override
-  Future<HttpClientRequest> postUrl(Uri url) => _openUrl('post', url);
-
-  @override
-  Future<HttpClientRequest> put(String host, int port, String path) =>
-      open('put', host, port, path);
-
-  @override
-  Future<HttpClientRequest> putUrl(Uri url) => _openUrl('put', url);
+  Future<HttpClientRequest> putUrl(Uri url) =>
+      _wrap(_innerClient.putUrl(url), 'put', url);
 
   // coverage:ignore-end
 

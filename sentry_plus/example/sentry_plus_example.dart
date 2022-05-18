@@ -40,6 +40,7 @@ void executeProgramm() async {
 
   final List<int> data = [/* ...*/];
   final decoder = utf8.decoder.wrapWithTraces();
+  // ignore: unused_local_variable
   final converted = decoder.convert(data);
 
   print('finished http request');
