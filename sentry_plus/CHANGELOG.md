@@ -1,3 +1,7 @@
+## 0.0.3
+
+- Various enhancements
+
 ## 0.0.2
 
 - Make this compatible with Dart ^2.17.0
