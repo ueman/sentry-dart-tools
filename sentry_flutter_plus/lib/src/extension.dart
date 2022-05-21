@@ -4,6 +4,7 @@ import 'package:sentry_flutter_plus/src/event_processor/linux_event_processor.da
 import 'package:sentry_flutter_plus/src/event_processor/windows_event_processor.dart';
 import 'package:sentry_flutter_plus/src/integrations/exclude_integrations.dart';
 import 'package:sentry_flutter_plus/src/integrations/on_error_integration.dart';
+import 'package:sentry_flutter_plus/src/integrations/platform_menu_integration.dart';
 import 'package:sentry_plus/sentry_plus.dart';
 
 extension SentryFlutterPlus on SentryFlutterOptions {
@@ -12,6 +13,11 @@ extension SentryFlutterPlus on SentryFlutterOptions {
     bool addFileTracing = true,
     bool addHttpTracing = true,
     bool addUnhandledEventProcessor = true,
+    // Sentry Flutter Plus
+    bool automaticInAppExcludes = true,
+    bool onErrorHandler = true,
+    bool platformMenuIntegration = true,
+    bool evenMoreEventEnrichment = true,
   }) {
     addSentryPlus(
       addFileTracing: addFileTracing,
@@ -19,11 +25,20 @@ extension SentryFlutterPlus on SentryFlutterOptions {
       addUnhandledEventProcessor: addUnhandledEventProcessor,
     );
 
-    addEventProcessor(FlutterEventProcessor());
-    addEventProcessor(LinuxEventProcessor());
-    addEventProcessor(WindowsEventProcessor());
+    if (evenMoreEventEnrichment) {
+      addEventProcessor(FlutterEventProcessor());
+      addEventProcessor(LinuxEventProcessor());
+      addEventProcessor(WindowsEventProcessor());
+    }
 
-    addIntegration(ExcludeIntegration());
-    addIntegration(OnErrorIntegration());
+    if (automaticInAppExcludes) {
+      addIntegration(ExcludeIntegration());
+    }
+    if (onErrorHandler) {
+      addIntegration(OnErrorIntegration());
+    }
+    if (platformMenuIntegration) {
+      addIntegration(PlatformMenuIntegration());
+    }
   }
 }

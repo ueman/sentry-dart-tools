@@ -1,39 +1,65 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Sentry Flutter Plus
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+This package includes a collection of community maintained integrations for Sentry.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+This also includes [`sentry_plus`](https://pub.dev/packages/sentry_plus).
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+# Automatic integrations
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+## Add all automatic integrations
 
 ```dart
-const like = 'sample';
+import 'package:sentry_plus/sentry_plus.dart';
+
+Future<void> main() {
+  // also works for SentryFlutter.init
+  return Sentry.init(
+    (options) {
+      options.addSentryPlus();
+      // other configuration omitted
+    },
+    appRunner: () {
+        // app code
+    },
+  );
+}
 ```
 
-## Additional information
+## PlatformMenu integration
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Adds automatic breadcrumbs for selecting platform menu (see [PlatformMenuBar](https://api.flutter.dev/flutter/widgets/PlatformMenuBar-class.html)).
+
+## `PlatformDispatcher.onError` error handler
+
+> **Note**
+> This is not yet available on the Flutter stable channel
+
+Automatic collection of exceptions reported to [`PlatformDispatcher.onError`](https://master-api.flutter.dev/flutter/dart-ui/PlatformDispatcher/onError.html).
+
+## In App Exclude integration
+
+Marks dependencies automatically as not in app for stacktraces.
+
+# Manual integrations
+
+## `SentryBinaryMessenger`
+
+This can be used to monitor messages from native to Flutter through message channels.
+
+# Debug only utilities
+
+## `WidgetTreeAttachment`
+
+> **Note**
+> This is only works in debug mode.
+
+This is an attachment which show the current widget tree. 
+
+## Design & support philosophy
+
+This code differs from Sentrys design and support philosophy:
+- This code doesn't try to be as backwards compatible as possible. This enables this code to make use of newer features.
+- This code doesn't try to stay free of dependencies. Low quality dependencies are still not allowed, though.
+- This code has no guarantees for API stability
+- When comparable features are implemented in (or moved to) Sentry, it will be removed from this package.
+- Features & integrations should be easy to integrate and use

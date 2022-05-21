@@ -10,7 +10,7 @@ typedef ErrorCallback = bool Function(Object exception, StackTrace stackTrace);
 /// See:
 /// - https://master-api.flutter.dev/flutter/dart-ui/PlatformDispatcher/onError.html
 ///
-/// Remarks: 
+/// Remarks:
 /// - Not existing on Flutter smaller or equal to 3.0.0
 // I believe this integration can replaces the https://github.com/getsentry/sentry-dart/blob/912b9205691837abdd546c62844bc9568b908495/dart/lib/src/default_integrations.dart#L15
 // partially, because we don't need the runZoneGuarded anymore. Though, that Zone is still used for print() call recording which means there's some advanced logic needed.
@@ -59,7 +59,7 @@ class OnErrorIntegration implements Integration<SentryFlutterOptions> {
 
       _platformDispatcherOnError = _integrationOnError;
 
-      options.sdk.addIntegration('PlatformDispatcher.onError');
+      options.sdk.addIntegration('OnErrorIntegration');
     } on NoSuchMethodError catch (_) {
       options.logger(
         SentryLevel.info,

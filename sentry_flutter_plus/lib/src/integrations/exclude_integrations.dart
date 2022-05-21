@@ -9,7 +9,7 @@ class ExcludeIntegration implements Integration<SentryFlutterOptions> {
     // _addInAppExcludes can take a while, so we don't await it,
     // in order to no artificially increase the startup time.
     unawaited(_addInAppExcludes(options));
-    options.sdk.addIntegration('InAppIntegration');
+    options.sdk.addIntegration('ExcludeIntegration');
   }
 
   @override
