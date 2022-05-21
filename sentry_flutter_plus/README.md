@@ -6,16 +6,22 @@ This also includes [`sentry_plus`](https://pub.dev/packages/sentry_plus).
 
 # Automatic integrations
 
+## Even more event enrichment
+
+This includes even more information for event.
+- Environment information for Windows
+- Environment information for Linux
+- More information which is available in newer Flutter versions.
+
 ## Add all automatic integrations
 
 ```dart
-import 'package:sentry_plus/sentry_plus.dart';
+import 'package:sentry_flutter_plus/sentry_flutter_plus.dart';
 
 Future<void> main() {
-  // also works for SentryFlutter.init
-  return Sentry.init(
+  return SentryFlutter.init(
     (options) {
-      options.addSentryPlus();
+      options.addSentryFlutterPlus();
       // other configuration omitted
     },
     appRunner: () {
@@ -46,6 +52,10 @@ Marks dependencies automatically as not in app for stacktraces.
 
 This can be used to monitor messages from native to Flutter through message channels.
 
+```dart
+final channel = MethodChannel('method_channel_name', const StandardMethodCodec(), SentryBinaryMessenger());
+```
+
 # Debug only utilities
 
 ## `WidgetTreeAttachment`
@@ -54,6 +64,13 @@ This can be used to monitor messages from native to Flutter through message chan
 > This is only works in debug mode.
 
 This is an attachment which show the current widget tree. 
+
+```dart
+Sentry.captureMessage('WidgetTreeAttachment',
+  withScope: (scope) {
+    scope.addAttachment(WidgetTreeAttachment());
+});
+```
 
 ## Design & support philosophy
 
