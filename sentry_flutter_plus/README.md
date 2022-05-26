@@ -46,9 +46,17 @@ Automatic collection of exceptions reported to [`PlatformDispatcher.onError`](ht
 
 Marks dependencies automatically as not in app for stacktraces.
 
+## MethodChannel integration
+
+Automatically collect breadcrumbs and performance traces for platform communication through MethodChannels.
+
 # Manual integrations
 
 ## `SentryBinaryMessenger`
+
+> **Note**
+> There's also the automatic integration available for this. 
+> Make sure to not use both.
 
 This can be used to monitor messages from native to Flutter through message channels.
 

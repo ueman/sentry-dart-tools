@@ -7,6 +7,8 @@ import 'package:sentry_flutter_plus/src/integrations/on_error_integration.dart';
 import 'package:sentry_flutter_plus/src/integrations/platform_menu_integration.dart';
 import 'package:sentry_plus/sentry_plus.dart';
 
+import 'integrations/binding_integration.dart';
+
 extension SentryFlutterPlus on SentryFlutterOptions {
   void addSentryFlutterPlus({
     // Sentry Plus
@@ -18,6 +20,7 @@ extension SentryFlutterPlus on SentryFlutterOptions {
     bool onErrorHandler = true,
     bool platformMenuIntegration = true,
     bool evenMoreEventEnrichment = true,
+    bool methodChannelTracing = true,
   }) {
     addSentryPlus(
       addFileTracing: addFileTracing,
@@ -39,6 +42,12 @@ extension SentryFlutterPlus on SentryFlutterOptions {
     }
     if (platformMenuIntegration) {
       addIntegration(PlatformMenuIntegration());
+    }
+
+    if (methodChannelTracing) {
+      addIntegrationByIndex(0, BindingIntegration());
+      removeIntegration(integrations.firstWhere(
+          (element) => element is WidgetsFlutterBindingIntegration));
     }
   }
 }
