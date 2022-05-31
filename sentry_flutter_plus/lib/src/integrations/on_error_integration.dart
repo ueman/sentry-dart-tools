@@ -11,10 +11,11 @@ typedef ErrorCallback = bool Function(Object exception, StackTrace stackTrace);
 /// - https://master-api.flutter.dev/flutter/dart-ui/PlatformDispatcher/onError.html
 ///
 /// Remarks:
-/// - Not existing on Flutter smaller or equal to 3.0.0
-// I believe this integration can replaces the https://github.com/getsentry/sentry-dart/blob/912b9205691837abdd546c62844bc9568b908495/dart/lib/src/default_integrations.dart#L15
-// partially, because we don't need the runZoneGuarded anymore. Though, that Zone is still used for print() call recording which means there's some advanced logic needed.
-// If the Zone and the print() call recording is not needed, the RunZonedGuardedIntegration should be disabled because that improves the app start performance.
+/// - Only usable on Flutter >= 3.1.0
+///
+/// This can be used instead of the [RunZonedGuardedIntegration]. Removing the
+/// [RunZonedGuardedIntegration] results in a minimal improved startup time,
+/// since creating [Zone]s is not cheap.
 class OnErrorIntegration implements Integration<SentryFlutterOptions> {
   ErrorCallback? _defaultOnError;
   ErrorCallback? _integrationOnError;

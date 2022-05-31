@@ -1,21 +1,43 @@
-import 'dart:async';
-
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../method_channel/sentry_binary_messenger.dart';
 
-class BindingIntegration extends Integration<SentryFlutterOptions> {
-  @override
-  FutureOr<void> call(Hub hub, SentryFlutterOptions options) {
-    // Can't be undone, so no overridden close method.
-    SentryWidgetsBinding();
-    options.sdk.addIntegration('BindingIntegration');
-  }
-}
+/// Must be used instead of [WidgetsFlutterBindingIntegration].
+/// If [WidgetsFlutterBindingIntegration] is used, this won't have
+/// any effect.
+/// Therefore, when using this integration, [WidgetsFlutterBindingIntegration]
+/// must be removed beforehand.
+///
+/// Must be used instead of [WidgetsFlutterBinding] and
+/// [WidgetsFlutterBinding.ensureInitialized].
+/// If [WidgetsFlutterBinding] is initialized before, this
+/// does not do anything.
+class WidgetsSentryBinding extends BindingBase
+    with
+        GestureBinding,
+        SchedulerBinding,
+        ServicesBinding,
+        PaintingBinding,
+        SemanticsBinding,
+        RendererBinding,
+        WidgetsBinding {
+  static bool _initialized = false;
 
-class SentryWidgetsBinding extends WidgetsFlutterBinding {
+  static WidgetsBinding ensureInitialized() {
+    if (!_initialized) WidgetsSentryBinding();
+    _initialized = true;
+    return WidgetsBinding.instance;
+  }
+
+  // RestorationManager looks interesting too,
+  // see https://api.flutter.dev/flutter/services/ServicesBinding/restorationManager.html
+
   @override
   @protected
   BinaryMessenger createBinaryMessenger() {
@@ -23,6 +45,4 @@ class SentryWidgetsBinding extends WidgetsFlutterBinding {
       binaryMessenger: super.createBinaryMessenger(),
     );
   }
-
-  // RestorationManager looks interesting too
 }
