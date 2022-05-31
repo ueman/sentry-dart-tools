@@ -19,6 +19,7 @@ const _defaultExcludes = [
   'flutter/mousecursor',
   'flutter/platform',
   'flutter/navigation',
+  'flutter/textinput',
 
   // Assets seem like a candidate which shouldn't be excluded,
   // since those are most likely bigger, and thus more expensive.
@@ -54,7 +55,10 @@ class SentryBinaryMessenger implements BinaryMessenger {
     var errored = false;
 
     ByteData? data;
-    final span = _hub.getSpan()?.startChild('method-channel');
+    final span = _hub.getSpan()?.startChild(
+          'method-channel',
+          description: channel,
+        );
     span?.setData('message_bytes', bytes);
 
     final watch = Stopwatch()..start();
