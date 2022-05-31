@@ -1,7 +1,7 @@
 name: sentry_flutter_plus
-description: A new Flutter package project.
-version: 0.0.1
-homepage:
+description: This package includes a collection of community maintained integrations for Sentry.
+version: 0.0.2
+repository: https://github.com/ueman/sentry-dart-tools
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
