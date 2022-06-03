@@ -19,7 +19,7 @@ class SentryCodec<S, T> implements Codec<S, T> {
     if (span == null || !_options.isTracingEnabled()) {
       return innerCodec.decode(encoded);
     }
-    span.setData('conversion', 'decode from encoded type "$T" to "$T"');
+    span.setData('conversion', 'decode from encoded type "$T" to "$S"');
     S decoded;
     try {
       decoded = innerCodec.decode(encoded);
