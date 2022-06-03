@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:sentry/sentry.dart';
+import 'extension.dart';
 
 class SentryConverter<S, T> implements Converter<S, T> {
   final Hub _hub;
@@ -18,13 +19,29 @@ class SentryConverter<S, T> implements Converter<S, T> {
   Converter<RS, RT> cast<RS, RT>() => innerConverter.cast();
 
   @override
-  T convert(S input) {
-    return innerConverter.convert(input);
+  T convert(S input) {    
+    final span = _hub.getSpan()?.startChild('serialize');
+    if (span == null || !_options.isTracingEnabled()) {
+      return innerCodec.decode(encoded);
+    }
+    span.setData('conversion', 'convert from type "$S" to type "$T"');
+    T converted;
+    try {
+      converted = innerConverter.convert(input);
+      span.status = const SpanStatus.ok();
+    } catch (e) {
+      span.throwable = e;
+      span.status = SpanStatus.internalError();
+      rethrow;
+    } finally {
+      unawaited(span.finish());
+    }
+    return converted;
   }
 
   @override
   Converter<S, TT> fuse<TT>(Converter<T, TT> other) {
-    return innerConverter.fuse(other);
+    return innerConverter.fuse(other).wrapWithTraces();
   }
 
   @override
