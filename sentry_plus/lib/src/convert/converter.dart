@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_field
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sentry/sentry.dart';
@@ -19,12 +20,12 @@ class SentryConverter<S, T> implements Converter<S, T> {
   Converter<RS, RT> cast<RS, RT>() => innerConverter.cast();
 
   @override
-  T convert(S input) {    
+  T convert(S input) {
     final span = _hub.getSpan()?.startChild('serialize');
     if (span == null || !_options.isTracingEnabled()) {
-      return innerCodec.decode(encoded);
+      return innerConverter.convert(input);
     }
-    span.setData('conversion', 'convert from type "$S" to type "$T"');
+    span.setData('convert', 'from type "$S" to type "$T"');
     T converted;
     try {
       converted = innerConverter.convert(input);
@@ -34,6 +35,8 @@ class SentryConverter<S, T> implements Converter<S, T> {
       span.status = SpanStatus.internalError();
       rethrow;
     } finally {
+      // It's only needed to be awaited if it's a transaction.
+      // Since we're not creating a transaction, no need to await it.
       unawaited(span.finish());
     }
     return converted;

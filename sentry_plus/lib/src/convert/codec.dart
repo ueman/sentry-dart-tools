@@ -50,6 +50,8 @@ class SentryCodec<S, T> implements Codec<S, T> {
       span.status = SpanStatus.internalError();
       rethrow;
     } finally {
+      // It's only needed to be awaited if it's a transaction.
+      // Since we're not creating a transaction, no need to await it.
       unawaited(span.finish());
     }
     return encoded;
