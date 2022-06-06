@@ -21,11 +21,13 @@ class SentryConverter<S, T> implements Converter<S, T> {
 
   @override
   T convert(S input) {
-    final span = _hub.getSpan()?.startChild('serialize');
+    final span = _hub.getSpan()?.startChild(
+          'serialize',
+          description: 'convert from type "$S" to type "$T"',
+        );
     if (span == null || !_options.isTracingEnabled()) {
       return innerConverter.convert(input);
     }
-    span.setData('convert', 'from type "$S" to type "$T"');
     T converted;
     try {
       converted = innerConverter.convert(input);

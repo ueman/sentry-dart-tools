@@ -15,11 +15,14 @@ class SentryCodec<S, T> implements Codec<S, T> {
 
   @override
   S decode(T encoded) {
-    final span = _hub.getSpan()?.startChild('serialize');
+    final span = _hub.getSpan()?.startChild(
+          'serialize',
+          description: 'decode from type "$T" to "$S"',
+        );
     if (span == null || !_options.isTracingEnabled()) {
       return innerCodec.decode(encoded);
     }
-    span.setData('conversion', 'decode from encoded type "$T" to "$S"');
+
     S decoded;
     try {
       decoded = innerCodec.decode(encoded);
@@ -29,6 +32,8 @@ class SentryCodec<S, T> implements Codec<S, T> {
       span.status = SpanStatus.internalError();
       rethrow;
     } finally {
+      // It's only needed to be awaited if it's a transaction.
+      // Since we're not creating a transaction, no need to await it.
       unawaited(span.finish());
     }
     return decoded;
@@ -36,11 +41,14 @@ class SentryCodec<S, T> implements Codec<S, T> {
 
   @override
   T encode(S input) {
-    final span = _hub.getSpan()?.startChild('serialize');
+    final span = _hub.getSpan()?.startChild(
+          'serialize',
+          description: 'encode from input type "$S" to "$T"',
+        );
     if (span == null || !_options.isTracingEnabled()) {
       return innerCodec.encode(input);
     }
-    span.setData('conversion', 'encode from input type "$S" to "$T"');
+
     T encoded;
     try {
       encoded = innerCodec.encode(input);
