@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:sentry_flutter_plus/src/widgets/sentry_widget.dart';
 
 import '../method_channel/sentry_binary_messenger.dart';
 
@@ -18,6 +19,9 @@ import '../method_channel/sentry_binary_messenger.dart';
 /// [WidgetsFlutterBinding.ensureInitialized].
 /// If [WidgetsFlutterBinding] is initialized before, this
 /// does not do anything.
+// ignore: todo
+// TODO: Make a mixin out of this so this could be used with other peoples
+// custom bindings
 class WidgetsSentryBinding extends BindingBase
     with
         GestureBinding,
@@ -35,8 +39,10 @@ class WidgetsSentryBinding extends BindingBase
     return WidgetsBinding.instance;
   }
 
-  // RestorationManager looks interesting too,
-  // see https://api.flutter.dev/flutter/services/ServicesBinding/restorationManager.html
+  @override
+  void attachRootWidget(Widget rootWidget) {
+    super.attachRootWidget(SentryWidget(child: rootWidget));
+  }
 
   @override
   @protected

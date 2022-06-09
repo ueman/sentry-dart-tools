@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:sentry_flutter_plus/src/breadcrumb.dart';
 
 /// This [Integration] adds [Breadcrumb]s for clicks on [MenuItem]s.
 /// It also starts automatic performance traces.
@@ -130,48 +131,6 @@ class SentryPlatformMenuDelegate implements PlatformMenuDelegate {
       label: item.label,
       shortcut: item.shortcut,
       onSelected: onSelected,
-    );
-  }
-}
-
-// https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/#breadcrumb-types
-class UiBreadcrumb extends Breadcrumb {
-  UiBreadcrumb({
-    String? message,
-    DateTime? timestamp,
-    Map<String, dynamic>? data,
-    SentryLevel? level,
-  }) : super(
-          category: 'ui.click',
-          type: 'user',
-          message: message,
-          timestamp: timestamp,
-          data: data,
-          level: level,
-        );
-
-  factory UiBreadcrumb.platformMenuItem(PlatformMenuItem item) {
-    return UiBreadcrumb(
-      message: 'PlatformMenuItem pressed',
-      data: {
-        'label': item.label,
-        'hasOnSelected': item.onSelected != null,
-        if (item.shortcut != null)
-          'shortcut':
-              item.shortcut?.serializeForMenu().toChannelRepresentation()
-      },
-    );
-  }
-
-  factory UiBreadcrumb.platformMenu(PlatformMenu menu, String action) {
-    return UiBreadcrumb(
-      message: 'PlatformMenu $action pressed',
-      data: {
-        'label': menu.label,
-        'hasOnOpen': menu.onOpen != null,
-        'hasOnClose': menu.onClose != null,
-        'menuCount': menu.menus.length,
-      },
     );
   }
 }
