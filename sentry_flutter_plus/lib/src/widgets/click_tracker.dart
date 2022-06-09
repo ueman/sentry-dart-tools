@@ -141,7 +141,7 @@ class _ClickTrackerState extends State<ClickTracker> {
       if (!paintBounds.contains(position)) {
         return;
       }
-      tappedWidget = _getDetectingElementDescription(element);
+      tappedWidget = _getDescriptionFrom(element);
 
       if (tappedWidget == null) {
         element.visitChildElements(elementFinder);
@@ -153,8 +153,9 @@ class _ClickTrackerState extends State<ClickTracker> {
     return tappedWidget;
   }
 
-  TappedWidget? _getDetectingElementDescription(Element element) {
+  TappedWidget? _getDescriptionFrom(Element element) {
     final widget = element.widget;
+    // Used by ElevatedButton, TextButton, OutlinedButton.
     if (widget is ButtonStyleButton) {
       if (widget.enabled) {
         return TappedWidget(
