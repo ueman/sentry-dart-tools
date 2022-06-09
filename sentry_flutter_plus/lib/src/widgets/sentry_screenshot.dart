@@ -5,7 +5,7 @@ import 'dart:ui' as ui show ImageByteFormat;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:sentry/sentry.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Key which is used to identify the [RepaintBoundary] which gets captured
 final _gloablKey = GlobalKey(debugLabel: 'sentry_screenshot');
