@@ -114,9 +114,12 @@ class SentryLinkHandler {
       await hub.captureException(
         exception,
         withScope: (scope) {
-          scope.contexts['GraphQL'] = <String, dynamic>{
-            'request': request.toJson(),
-          };
+          scope.setContexts(
+            'GraphQL', 
+            <String, dynamic>{
+              'request': request.toJson(),
+            },
+          );
         },
       );
     }
