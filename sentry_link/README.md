@@ -14,5 +14,7 @@ final link = Link.from([
 ]);
 ```
 
+In addition to that, you can add `GqlEventProcessor` to Sentry's event processor, to improve support for nested `LinkExceptions`. 
+
 A GraphQL error will be reported like the following screenshot: 
 <img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
