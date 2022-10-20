@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_flutter_plus/sentry_flutter_plus.dart';
@@ -14,6 +16,7 @@ void main() {
     options.addSentryFlutterPlus();
     options.debug = true;
     options.enablePrintBreadcrumbs = false;
+    options.addIntegration(TreeWalkerIntegration());
   });
 
   runApp(const MyApp());
@@ -47,12 +50,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return PlatformMenuBar(
-      menus: <MenuItem>[
+      menus: <PlatformMenuItem>[
         PlatformMenu(
           label: 'Various',
-          menus: <MenuItem>[
+          menus: <PlatformMenuItem>[
             PlatformMenuItemGroup(
-              members: <MenuItem>[
+              members: <PlatformMenuItem>[
                 PlatformMenuItem(
                   label: 'About',
                   onSelected: () {
@@ -65,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             PlatformMenuItemGroup(
-              members: <MenuItem>[
+              members: <PlatformMenuItem>[
                 PlatformMenuItem(
                   onSelected: () {
                     Sentry.captureException(Exception());
@@ -85,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ],
-      body: Scaffold(
+      child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
@@ -93,20 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  // Backwards/Forwards comaptibility foo
-                  (WidgetsFlutterBinding.ensureInitialized().platformDispatcher
-                          as dynamic)
-                      .onError
-                      ?.call(Exception(), StackTrace.current);
-                },
-                child: const Text(
-                  'PlatformDispatcher.onError '
-                  '(works only on Flutter >= 3.1.0) '
-                  'handler called directly',
-                ),
-              ),
               ElevatedButton(
                 onPressed: () async {
                   await Future.delayed(const Duration(milliseconds: 500));
@@ -146,6 +135,49 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Text(
                   'MethodChannel communication',
                 ),
+              ),
+              ElevatedButton(
+                key: const Key('exception_button'),
+                onPressed: () async {
+                  if (kDebugMode) {
+                    print('capture exception');
+                  }
+                  await Sentry.captureException(
+                      Exception('Oh no, an exception ${DateTime.now()}'));
+                },
+                child: const Text('Oh no, an error'),
+              ),
+              ElevatedButton(
+                key: const Key('tree walker'),
+                onPressed: () async {
+                  final tree =
+                      TreeWalker(WidgetsBinding.instance.renderViewElement)
+                          .compute()
+                          ?.toString();
+
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: SingleChildScrollView(
+                          child: Text(tree ?? 'Error'),
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () =>
+                                Clipboard.setData(ClipboardData(text: tree)),
+                            child: const Text('Copy to clipboard'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Close'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: const Text('execute tree walker'),
               ),
             ],
           ),

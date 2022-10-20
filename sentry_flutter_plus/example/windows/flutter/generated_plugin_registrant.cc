@@ -6,7 +6,7 @@
 
 #include "generated_plugin_registrant.h"
 
-#include <battery_plus_windows/battery_plus_windows_plugin.h>
+#include <battery_plus/battery_plus_windows_plugin.h>
 #include <sentry_flutter/sentry_flutter_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {

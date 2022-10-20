@@ -61,12 +61,12 @@ class SentryPlatformMenuDelegate implements PlatformMenuDelegate {
   }
 
   @override
-  void setMenus(List<MenuItem> topLevelMenus) {
+  void setMenus(List<PlatformMenuItem> topLevelMenus) {
     // it would be cool to have a tree view of the menu
     _delegate.setMenus(topLevelMenus.map(_mapper).toList());
   }
 
-  MenuItem _mapper(MenuItem item) {
+  PlatformMenuItem _mapper(PlatformMenuItem item) {
     // known subtypes of MenuItem
     // - PlatformMenu
     // - PlatformMenuItemGroup
@@ -74,17 +74,16 @@ class SentryPlatformMenuDelegate implements PlatformMenuDelegate {
     // - PlatformProvidedMenuItem
     if (item is PlatformProvidedMenuItem) {
       return _platformProvidedMenuItemMapper(item);
-    } else if (item is PlatformMenuItem) {
-      return _platformMenuItemMapper(item);
     } else if (item is PlatformMenuItemGroup) {
       return _platformMenuItemGroupMapper(item);
     } else if (item is PlatformMenu) {
       return _platformMenuMapper(item);
     }
-    return item;
+
+    return _platformMenuItemMapper(item);
   }
 
-  MenuItem _platformMenuMapper(PlatformMenu item) {
+  PlatformMenuItem _platformMenuMapper(PlatformMenu item) {
     var onOpen = item.onOpen;
     if (onOpen != null) {
       onOpen = () {
@@ -108,18 +107,19 @@ class SentryPlatformMenuDelegate implements PlatformMenuDelegate {
     );
   }
 
-  MenuItem _platformProvidedMenuItemMapper(PlatformProvidedMenuItem item) {
+  PlatformMenuItem _platformProvidedMenuItemMapper(
+      PlatformProvidedMenuItem item) {
     // nothing can be done for these :(
     return item;
   }
 
-  MenuItem _platformMenuItemGroupMapper(PlatformMenuItemGroup item) {
+  PlatformMenuItem _platformMenuItemGroupMapper(PlatformMenuItemGroup item) {
     return PlatformMenuItemGroup(
       members: item.members.map(_mapper).toList(),
     );
   }
 
-  MenuItem _platformMenuItemMapper(PlatformMenuItem item) {
+  PlatformMenuItem _platformMenuItemMapper(PlatformMenuItem item) {
     var onSelected = item.onSelected;
     if (onSelected != null) {
       onSelected = () {

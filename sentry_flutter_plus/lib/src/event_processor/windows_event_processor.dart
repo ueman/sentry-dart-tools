@@ -33,7 +33,11 @@ class WindowsEventProcessor implements EventProcessor {
     SentryOperatingSystem? os,
     WindowsDeviceInfo info,
   ) {
-    return (os ?? const SentryOperatingSystem()).copyWith();
+    return (os ?? const SentryOperatingSystem()).copyWith(
+      build: info.buildNumber.toString(),
+      name: info.productName,
+      version: info.displayVersion,
+    );
   }
 
   SentryDevice _getDevice(

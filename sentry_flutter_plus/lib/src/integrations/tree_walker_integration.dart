@@ -25,14 +25,21 @@ class TreeWalker {
     if (root == null) {
       return null;
     }
-    final rootNode = Node(root.widgetTypeName, root.widget.key);
+    final rootNode = Node(root.widgetTypeName, root.widget.key, root.position,
+        root.size, root.info);
     root.visitChildElements(_visitor(rootNode));
     return rootNode;
   }
 
   ValueChanged<Element> _visitor(Node parentNode) {
     return (Element element) {
-      final node = Node(element.widgetTypeName, element.widget.key);
+      final node = Node(
+        element.widgetTypeName,
+        element.widget.key,
+        element.position,
+        element.size,
+        element.info,
+      );
       parentNode.children.add(node);
       element.visitChildElements(_visitor(node));
     };
@@ -40,16 +47,28 @@ class TreeWalker {
 }
 
 class Node {
-  Node(this.name, this.key);
+  Node(this.name, this.key, this.position, this.size, this.extraData);
 
   String name;
   Key? key;
+  Offset position;
+  Size? size;
+  String? extraData;
   List<Node> children = [];
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
       if (key != null) 'key': key.toString(),
+      'position': {
+        'x': position.dx,
+        'y': position.dy,
+      },
+      'size': {
+        'height': size?.height,
+        'width': size?.width,
+      },
+      'extraData': extraData,
       if (children.isNotEmpty)
         'children': children.map((e) => e.toMap()).toList(growable: false),
     };
@@ -76,7 +95,8 @@ class Node {
     }
     buffer.writeln(name);
     if (key != null) {
-      buffer.write(' (Key: $key)');
+      buffer.write(
+          ' (Key: $key, position: $position, size: $size, extraData: $extraData)');
     }
 
     for (int i = 0; i < children.length; i++) {
@@ -87,6 +107,18 @@ class Node {
 
 extension on Element {
   String get widgetTypeName => widget.runtimeType.toString();
+
+  RenderBox get _asRenderBox => renderObject as RenderBox;
+
+  Offset get position => _asRenderBox.localToGlobal(Offset.zero);
+
+  String? get info {
+    final w = widget;
+    if (w is Text) {
+      return w.data ?? w.textSpan?.toPlainText();
+    }
+    return null;
+  }
 }
 
 class TreeAttachment extends SentryAttachment {

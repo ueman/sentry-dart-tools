@@ -35,13 +35,6 @@ Future<void> main() {
 
 Adds automatic breadcrumbs for selecting platform menu (see [PlatformMenuBar](https://api.flutter.dev/flutter/widgets/PlatformMenuBar-class.html)).
 
-## `PlatformDispatcher.onError` error handler
-
-> **Note**
-> This is not yet available on the Flutter stable channel
-
-Automatic collection of exceptions reported to [`PlatformDispatcher.onError`](https://master-api.flutter.dev/flutter/dart-ui/PlatformDispatcher/onError.html).
-
 ## In App Exclude integration
 
 Marks dependencies automatically as not in app for stacktraces.

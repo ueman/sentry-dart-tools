@@ -5,7 +5,7 @@
 import FlutterMacOS
 import Foundation
 
-import battery_plus_macos
+import battery_plus
 import device_info_plus_macos
 import package_info_plus_macos
 import sentry_flutter
