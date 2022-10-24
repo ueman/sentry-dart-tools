@@ -1,0 +1,17 @@
+name: sentry_graphql
+description: Adds performance tracing for the `graphql` library by integrating Sentry
+version: 0.1.0
+repository: https://github.com/ueman/sentry-dart-tools/tree/main/sentry_graphql
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  sentry: ^6.12.2
+  graphql: ^5.0.0
+  # http is constrained by graphql
+  http: any
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.16.0
