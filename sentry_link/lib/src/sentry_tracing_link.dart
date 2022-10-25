@@ -38,6 +38,7 @@ class SentryTracingLink extends Link {
     );
     return forward!(request).transform(StreamTransformer.fromHandlers(
       handleData: (data, sink) {
+        // todo: mark trx as failed when server responds with graphql errors?
         transaction?.finish(status: const SpanStatus.ok());
         sink.add(data);
       },
