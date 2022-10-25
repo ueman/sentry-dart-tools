@@ -5,11 +5,14 @@ Integration for the [`gql_link`](https://pub.dev/packages/gql_link) package to c
 
 ## Usage
 
-Just add `SentryLink.link()` to your links.
+Just add `SentryLink.link()` and/or `SentryTracingLink` to your links.
 ```dart
 final link = Link.from([
-    SentryLink.link(),
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
+    // SentryLink records exceptions
+    SentryLink.link(),
+    // SentryTracingLink adds performance tracing with Sentry
+    SentryTracingLink(shouldStartTransaction: true),
     HttpLink('https://api.github.com/graphql'),
 ]);
 ```
