@@ -64,7 +64,11 @@ class SentryTracingLink extends Link {
   ) {
     final span = _hub.getSpan();
     if (span == null && shouldStartTransaction) {
-      return _hub.startTransaction(description, op);
+      return _hub.startTransaction(
+        description,
+        op,
+        bindToScope: true,
+      );
     } else if (span != null) {
       return span.startChild(op, description: description);
     }
