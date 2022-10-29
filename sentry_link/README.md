@@ -21,3 +21,32 @@ In addition to that, you can add `GqlEventProcessor` to Sentry's event processor
 
 A GraphQL error will be reported like the following screenshot: 
 <img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
+
+
+## `SentryResponseParser` and `SentryRequestSerializer` 
+
+The `SentryResponseParser` and `SentryRequestSerializer` classes can be used to trace the serialization process. 
+Both classes work with `HttpLink` and `DioLink`. 
+When using the `HttpLink`, you can additionally use the `sentryResponseDecoder` function.
+
+```dart
+import 'package:sentry_link/sentry_link.dart';
+
+final link = Link.from([
+    SentryLink.link(),
+    AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
+    SentryTracingLink(shouldStartTransaction: true),
+    HttpLink(
+      'https://api.github.com/graphql',
+      httpClient: SentryHttpClient(networkTracing: true),
+      serializer: SentryRequestSerializer(),
+      parser: SentryResponseParser(),
+      httpResponseDecoder: sentryResponseDecoder,
+    ),
+  ]);
+
+  final client = GraphQLClient(
+    cache: GraphQLCache(),
+    link: link,
+  );
+```

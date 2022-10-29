@@ -1,6 +1,7 @@
 ## 0.1.0
 
 - Add `SentryTracingLink` which creates performance traces 
+- Add `SentryResponseParser`, `SentryRequestSerializer` and `sentryResponseDecoder` which create spans for (de)serialization operations
 
 ## 0.0.3
 
