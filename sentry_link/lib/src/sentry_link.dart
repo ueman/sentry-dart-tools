@@ -2,7 +2,7 @@ import 'package:gql_error_link/gql_error_link.dart';
 import 'package:gql_exec/gql_exec.dart';
 import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
-import 'extension.dart';
+import 'package:sentry_link/src/extension.dart';
 
 /// Provides a `Link` which captures exceptions and GraphQL errors
 class SentryLink {
@@ -115,7 +115,7 @@ class SentryLinkHandler {
         exception,
         withScope: (scope) {
           scope.setContexts(
-            'GraphQL', 
+            'GraphQL',
             <String, dynamic>{
               'request': request.toJson(),
             },

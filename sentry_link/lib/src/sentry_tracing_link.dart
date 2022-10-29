@@ -22,7 +22,7 @@ class SentryTracingLink extends Link {
   Stream<Response> request(Request request, [NextLink? forward]) {
     assert(
       forward != null,
-      "This is not a terminating link and needs a NextLink",
+      'This is not a terminating link and needs a NextLink',
     );
 
     final isQuery = request.isQuery;
@@ -32,14 +32,14 @@ class SentryTracingLink extends Link {
     final type = isQuery ? 'query' : 'mutation';
 
     final transaction = _startSpan(
-      "GraphQL $type ${request.operation.operationName ?? 'unnamed'}",
+      'GraphQL: "${request.operation.operationName ?? 'unnamed'}" $type',
       operation,
       shouldStartTransaction,
     );
     return forward!(request).transform(StreamTransformer.fromHandlers(
       handleData: (data, sink) {
         // todo: mark trx as failed when server responds with graphql errors?
-        transaction?.finish(status: const SpanStatus.ok());
+        unawaited(transaction?.finish(status: const SpanStatus.ok()));
         sink.add(data);
       },
       handleError: (error, stackTrace, sink) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:graphql/client.dart';
+import 'package:gql_exec/gql_exec.dart';
+import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
 
 class SentryResponseParser implements ResponseParser {
@@ -15,7 +16,8 @@ class SentryResponseParser implements ResponseParser {
   Response parseResponse(Map<String, dynamic> body) {
     final span = _hub.getSpan()?.startChild(
           'serialize.http.client',
-          description: 'Response serialization',
+          description: 'Response deserialization '
+              'from JSON map to Response object',
         );
     Response result;
     try {

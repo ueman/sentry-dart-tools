@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:gql_exec/gql_exec.dart';
 import 'package:sentry/sentry.dart';
-import "package:gql/language.dart" show printNode;
+import 'package:gql/language.dart' show printNode;
 
 extension GraphQLErrorListX on List<GraphQLError> {
   List<SentryException> toSentryExceptions(Request request, Response response) {
@@ -34,7 +34,7 @@ extension GraphQLErrorX on GraphQLError {
     final lines = printNode(request.operation.document).split('\n');
     final contextLine = lines[contextLineNumber];
     return SentryException(
-      type: 'GraphQlError',
+      type: message,
       value: message,
       mechanism: Mechanism(type: 'GraphQlError', data: extensions),
       stackTrace: SentryStackTrace(frames: [

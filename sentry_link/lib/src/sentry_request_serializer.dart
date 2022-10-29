@@ -1,21 +1,34 @@
-import "package:gql/language.dart";
-import "package:gql_exec/gql_exec.dart";
+import 'dart:async';
 
-/// JSON [Request] serializer.
-class RequestSerializer {
-  const RequestSerializer();
+import 'package:gql_exec/gql_exec.dart';
+import 'package:gql_link/gql_link.dart';
+import 'package:sentry/sentry.dart';
 
-  /// Serializes the request
-  ///
-  /// Extend this to add non-standard behavior
+class SentryRequestSerializer implements RequestSerializer {
+  SentryRequestSerializer({RequestSerializer? inner, Hub? hub})
+      : inner = inner ?? const RequestSerializer(),
+        _hub = hub ?? HubAdapter();
+
+  final RequestSerializer inner;
+  final Hub _hub;
+
+  @override
   Map<String, dynamic> serializeRequest(Request request) {
-    final RequestExtensionsThunk? thunk = request.context.entry();
-
-    return <String, dynamic>{
-      "operationName": request.operation.operationName,
-      "variables": request.variables,
-      "query": printNode(request.operation.document),
-      if (thunk != null) "extensions": thunk.getRequestExtensions(request),
-    };
+    final span = _hub.getSpan()?.startChild(
+          'serialize.http.client',
+          description: 'GraphGL request serialization',
+        );
+    Map<String, dynamic> result;
+    try {
+      result = inner.serializeRequest(request);
+      span?.status = const SpanStatus.ok();
+    } catch (e) {
+      span?.status = const SpanStatus.unknownError();
+      span?.throwable = e;
+      rethrow;
+    } finally {
+      unawaited(span?.finish());
+    }
+    return result;
   }
 }
