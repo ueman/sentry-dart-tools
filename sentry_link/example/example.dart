@@ -4,13 +4,12 @@ import 'package:graphql/client.dart';
 import 'package:sentry/sentry.dart';
 import 'package:sentry_link/sentry_link.dart';
 
-const personalAccessToken = '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';
+const personalAccessToken = 'token';
 
 Future<void> main() {
   return Sentry.init(
     (options) {
-      options.dsn =
-          'https://c8f216b28d814d2ca83e52fb735da535@o266569.ingest.sentry.io/5558444';
+      options.dsn = 'sentry_dsn';
       options.addEventProcessor(GqlEventProcessor(options));
       options.tracesSampleRate = 1;
     },

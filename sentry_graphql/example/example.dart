@@ -7,12 +7,13 @@ import 'package:graphql/client.dart';
 import 'package:sentry/sentry.dart';
 import 'package:sentry_graphql/sentry_graphql.dart';
 
-const personalAccessToken = '<token>';
+const personalAccessToken = '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';
 
 Future<void> main() {
   return Sentry.init(
     (options) {
-      options.dsn = '<sentry-dsn>';
+      options.dsn =
+          'https://c8f216b28d814d2ca83e52fb735da535@o266569.ingest.sentry.io/5558444';
       options.tracesSampleRate = 1;
       options.debug = true;
     },
@@ -28,9 +29,6 @@ Future<void> example() async {
     HttpLink(
       'https://api.github.com/graphql',
       httpClient: SentryHttpClient(networkTracing: true),
-      serializer: SentryRequestSerializer(),
-      parser: SentryResponseParser(),
-      httpResponseDecoder: sentryResponseDecoder,
     ),
   ]);
 
