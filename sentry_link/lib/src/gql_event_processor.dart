@@ -27,13 +27,14 @@ class GqlEventProcessor extends EventProcessor {
       return event;
     }
 
-    final exceptions = <Object>[];
+    final exceptions = <_Container>[];
     _extractExceptions(throwable, exceptions);
 
     final sentryExceptions = <SentryException>[];
 
     for (final e in exceptions) {
-      sentryExceptions.add(_sentryExceptionFactory.getSentryException(e));
+      sentryExceptions.add(_sentryExceptionFactory
+          .getSentryException(e.exception, stackTrace: e.stackTrace));
     }
 
     return event.copyWith(
@@ -45,7 +46,7 @@ class GqlEventProcessor extends EventProcessor {
   }
 }
 
-void _extractExceptions(Object exception, List<Object> exceptions) {
+void _extractExceptions(Object exception, List<_Container> exceptions) {
   // Also usable for
   // - RequestFormatException
   // - ResponseFormatException
@@ -54,9 +55,16 @@ void _extractExceptions(Object exception, List<Object> exceptions) {
   // - ServerException
   if (exception is LinkException) {
     final innerException = exception.originalException;
-    if (innerException is LinkException) {
-      exceptions.add(innerException);
+    if (innerException != null) {
+      exceptions.add(_Container(innerException, exception.originalStackTrace));
       return _extractExceptions(innerException, exceptions);
     }
   }
+}
+
+class _Container {
+  _Container(this.exception, this.stackTrace);
+
+  final Object? exception;
+  final StackTrace? stackTrace;
 }

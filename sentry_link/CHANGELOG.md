@@ -1,6 +1,7 @@
 ## 0.1.1
 
 - Update `gql` dependencies
+- Add inner exceptions for event processor
 
 ## 0.1.0
 
