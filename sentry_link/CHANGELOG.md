@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Update `gql` dependencies
+
 ## 0.1.0
 
 - Add `SentryTracingLink` which creates performance traces 
