@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_flutter_plus/src/widgets/sentry_widget.dart';
 
 import '../method_channel/sentry_binary_messenger.dart';

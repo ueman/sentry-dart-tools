@@ -16,7 +16,6 @@ extension SentryFlutterPlus on SentryFlutterOptions {
     bool automaticInAppExcludes = true,
     bool platformMenuIntegration = true,
     bool evenMoreEventEnrichment = true,
-    bool methodChannelTracing = true,
   }) {
     addSentryPlus(
       addFileTracing: addFileTracing,
@@ -35,11 +34,6 @@ extension SentryFlutterPlus on SentryFlutterOptions {
     }
     if (platformMenuIntegration) {
       addIntegration(PlatformMenuIntegration());
-    }
-
-    if (methodChannelTracing) {
-      removeIntegration(integrations.firstWhere(
-          (element) => element is WidgetsFlutterBindingIntegration));
     }
   }
 }
