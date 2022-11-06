@@ -2,8 +2,8 @@ import 'package:sentry/sentry.dart';
 import 'package:stack_trace/stack_trace.dart';
 
 extension InAppExtension on SentryOptions {
-  // Doesn't work as integration, because it's run in another zone, so no access
-  // to the original main function.
+  /// Doesn't work as integration, because it's run in another zone, so no access
+  /// to the original main function.
   void addAutomaticInApp() {
     try {
       final stackTrace = Trace.current();

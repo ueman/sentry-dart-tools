@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:sentry/sentry.dart';
 
+/// Mark every exception as unhandled which is not handled by user code.
 class UnhandledEventProcessor implements EventProcessor {
   @override
   FutureOr<SentryEvent?> apply(SentryEvent event, {hint}) {

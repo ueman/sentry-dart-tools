@@ -5,6 +5,7 @@ import 'http/http_extension.dart';
 import 'integration/in_app_integration.dart';
 
 extension AddAllExtension on SentryOptions {
+  /// Add all automatic integrations
   void addSentryPlus({
     bool addFileTracing = true,
     bool addHttpTracing = true,
