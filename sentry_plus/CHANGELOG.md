@@ -1,3 +1,7 @@
+## 0.1.0
+
+- Raise Dart requirement to 2.18 to make file performance tracing compatible with newer Dart versions. 
+
 ## 0.0.4
 
 - Various enhancements
