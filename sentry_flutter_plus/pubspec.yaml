@@ -1,6 +1,6 @@
 name: sentry_flutter_plus
 description: This package includes a collection of community maintained integrations for Sentry.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/ueman/sentry-dart-tools
 
 environment:
@@ -12,12 +12,12 @@ dependencies:
     sdk: flutter
   sentry_flutter: ^6.12.1
   sentry_plus: ^0.0.4
-  device_info_plus: ^6.0.0
+  device_info_plus: ^8.0.0
   battery_plus: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.0
 
 flutter:

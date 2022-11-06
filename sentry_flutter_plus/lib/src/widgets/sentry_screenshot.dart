@@ -33,7 +33,7 @@ class SentryScreenshot extends StatefulWidget {
   final Hub? hub;
 
   @override
-  _SentryScreenshotState createState() => _SentryScreenshotState();
+  State<SentryScreenshot> createState() => _SentryScreenshotState();
 }
 
 class _SentryScreenshotState extends State<SentryScreenshot> {
@@ -82,14 +82,14 @@ class ScreenshotAttachment implements SentryAttachment {
     //return await createScreenshot() ?? Uint8List.fromList([]);
     final instance = SchedulerBinding.instance;
 
-    final _completer = Completer<Uint8List?>();
+    final completer = Completer<Uint8List?>();
     // We add an post frame callback because we aren't able to take a screenshot
     // if there's currently a draw in process.
     instance.addPostFrameCallback((timeStamp) async {
       final image = await createScreenshot();
-      _completer.complete(image);
+      completer.complete(image);
     });
-    return await _completer.future ?? Uint8List.fromList([]);
+    return await completer.future ?? Uint8List.fromList([]);
   }
 
   @visibleForTesting

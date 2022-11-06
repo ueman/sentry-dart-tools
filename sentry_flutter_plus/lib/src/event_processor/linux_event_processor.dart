@@ -34,7 +34,7 @@ class LinuxEventProcessor implements EventProcessor {
   ) {
     return (os ?? const SentryOperatingSystem()).copyWith(
       build: info.buildId,
-      name: info.name,
+      name: info.prettyName,
       version: info.version,
     );
   }
