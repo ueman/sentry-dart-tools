@@ -7,6 +7,7 @@ Integration for the [`gql_link`](https://pub.dev/packages/gql_link) package to c
 ## Usage
 
 Just add `SentryLink.link()` and/or `SentryTracingLink` to your links.
+It will add error reporting and performance monitoring to your GraphQL operations.
 ```dart
 final link = Link.from([
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
