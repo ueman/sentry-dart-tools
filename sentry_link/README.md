@@ -2,7 +2,8 @@
 
 [![pub package](https://img.shields.io/pub/v/sentry_link.svg)](https://pub.dev/packages/sentry_link) [![likes](https://img.shields.io/pub/likes/sentry_link)](https://pub.dev/packages/sentry_link/score) [![popularity](https://img.shields.io/pub/popularity/sentry_link)](https://pub.dev/packages/sentry_link/score) [![pub points](https://img.shields.io/pub/points/sentry_link)](https://pub.dev/packages/sentry_link/score)
 
-Integration for the [`gql_link`](https://pub.dev/packages/gql_link) package to collect error reports for GraphQL requests. This is used by a wide variety of GraphQL libraries like [`ferry`](https://pub.dev/packages/ferry) or [`graphql`](https://pub.dev/packages/graphql).
+Integration for the [`gql_link`](https://pub.dev/packages/gql_link) package to collect error reports for GraphQL requests.
+This is used by a wide variety of GraphQL libraries like [`ferry`](https://pub.dev/packages/ferry), [`graphql`](https://pub.dev/packages/graphql) or [`artemis`](https://pub.dev/packages/artemis)
 
 ## Usage
 
