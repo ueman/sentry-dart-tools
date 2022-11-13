@@ -7,3 +7,7 @@ export 'src/integrations/platform_menu_integration.dart'
 export 'src/integrations/binding_integration.dart';
 export 'src/integrations/tree_walker_integration.dart';
 export 'src/integrations/jank_detection_integration.dart';
+export 'src/event_processor/exception_event_processor.dart';
+export 'src/event_processor/flutter_event_processor.dart';
+export 'src/event_processor/linux_event_processor.dart';
+export 'src/event_processor/windows_event_processor.dart';

@@ -1,3 +1,7 @@
+## 0.3.0
+
+- remove dependency on `sentry_plus`
+
 ## 0.2.0
 
 * Delete widget tree attachment

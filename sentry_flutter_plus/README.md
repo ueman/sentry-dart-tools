@@ -1,8 +1,10 @@
 # Sentry Flutter Plus
 
+[![pub package](https://img.shields.io/pub/v/sentry_flutter_plus.svg)](https://pub.dev/packages/sentry_flutter_plus) [![likes](https://img.shields.io/pub/likes/sentry_flutter_plus)](https://pub.dev/packages/sentry_flutter_plus/score) [![popularity](https://img.shields.io/pub/popularity/sentry_flutter_plus)](https://pub.dev/packages/sentry_flutter_plus/score) [![pub points](https://img.shields.io/pub/points/sentry_flutter_plus)](https://pub.dev/packages/sentry_flutter_plus/score)
+
 This package includes a collection of community maintained integrations for Sentry.
 
-This also includes [`sentry_plus`](https://pub.dev/packages/sentry_plus).
+Consider using [`sentry_plus`](https://pub.dev/packages/sentry_plus) for additionaly integrations.
 
 # Automatic integrations
 
@@ -57,22 +59,6 @@ This can be used to monitor messages from native to Flutter through message chan
 final channel = MethodChannel('method_channel_name', const StandardMethodCodec(), SentryBinaryMessenger());
 ```
 
-# Debug only utilities
-
-## `WidgetTreeAttachment`
-
-> **Note**
-> This is only works in debug mode.
-
-This is an attachment which show the current widget tree. 
-
-```dart
-Sentry.captureMessage('WidgetTreeAttachment',
-  withScope: (scope) {
-    scope.addAttachment(WidgetTreeAttachment());
-});
-```
-
 ## Design & support philosophy
 
 This code differs from Sentrys design and support philosophy:
@@ -81,3 +67,8 @@ This code differs from Sentrys design and support philosophy:
 - This code has no guarantees for API stability
 - When comparable features are implemented in (or moved to) Sentry, it will be removed from this package.
 - Features & integrations should be easy to integrate and use
+
+## 📣 About the author
+
+- [![Twitter Follow](https://img.shields.io/twitter/follow/ue_man?style=social)](https://twitter.com/ue_man)
+- [![GitHub followers](https://img.shields.io/github/followers/ueman?style=social)](https://github.com/ueman)
