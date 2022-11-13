@@ -2,13 +2,22 @@
 
 [![pub package](https://img.shields.io/pub/v/sentry_link.svg)](https://pub.dev/packages/sentry_link) [![likes](https://img.shields.io/pub/likes/sentry_link)](https://pub.dev/packages/sentry_link/score) [![popularity](https://img.shields.io/pub/popularity/sentry_link)](https://pub.dev/packages/sentry_link/score) [![pub points](https://img.shields.io/pub/points/sentry_link)](https://pub.dev/packages/sentry_link/score)
 
-Integration for the [`gql_link`](https://pub.dev/packages/gql_link) package to collect error reports for GraphQL requests.
-This is used by a wide variety of GraphQL libraries like [`ferry`](https://pub.dev/packages/ferry), [`graphql`](https://pub.dev/packages/graphql) or [`artemis`](https://pub.dev/packages/artemis)
+## Compatibility list
+
+This integration is compatible with the following packages. It's also compatible with other packages which are build on `gql` suite of packages.
+
+| package | stats |
+|---------|-------|
+| [`gql_link`](https://pub.dev/packages/gql_link) | <a href="https://pub.dev/packages/graphql/score"><img src="https://img.shields.io/pub/likes/gql_link" alt="likes"></a> <a href="https://pub.dev/packages/gql_link/score"><img src="https://img.shields.io/pub/popularity/gql_link" alt="popularity"></a> <a href="https://pub.dev/packages/gql_link/score"><img src="https://img.shields.io/pub/points/gql_link" alt="pub points"></a> |
+| [`graphql`](https://pub.dev/packages/graphql) | <a href="https://pub.dev/packages/graphql/score"><img src="https://img.shields.io/pub/likes/graphql" alt="likes"></a> <a href="https://pub.dev/packages/graphql/score"><img src="https://img.shields.io/pub/popularity/graphql" alt="popularity"></a> <a href="https://pub.dev/packages/graphql/score"><img src="https://img.shields.io/pub/points/graphql" alt="pub points"></a> |
+| [`ferry`](https://pub.dev/packages/ferry) | <a href="https://pub.dev/packages/ferry/score"><img src="https://img.shields.io/pub/likes/ferry" alt="likes"></a> <a href="https://pub.dev/packages/ferry/score"><img src="https://img.shields.io/pub/popularity/ferry" alt="popularity"></a> <a href="https://pub.dev/packages/ferry/score"><img src="https://img.shields.io/pub/points/ferry" alt="pub points"></a> |
+| [`artemis`](https://pub.dev/packages/artemis) | <a href="https://pub.dev/packages/artemis/score"><img src="https://img.shields.io/pub/likes/artemis" alt="likes"></a> <a href="https://pub.dev/packages/artemis/score"><img src="https://img.shields.io/pub/popularity/artemis" alt="popularity"></a> <a href="https://pub.dev/packages/artemis/score"><img src="https://img.shields.io/pub/points/artemis" alt="pub points"></a> |
 
 ## Usage
 
 Just add `SentryLink.link()` and/or `SentryTracingLink` to your links.
 It will add error reporting and performance monitoring to your GraphQL operations.
+
 ```dart
 final link = Link.from([
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
@@ -20,17 +29,22 @@ final link = Link.from([
 ]);
 ```
 
-In addition to that, you can add `GqlEventProcessor` to Sentry's event processor, to improve support for nested `LinkExceptions`. 
+In addition to that, you can add `GqlEventProcessor` to Sentry's event processor, to improve support for nested [`LinkException`](https://pub.dev/documentation/gql_link/latest/link/LinkException-class.html)s and its subclasses.
 
 A GraphQL error will be reported like the following screenshot: 
 <img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
 
+## `SentryBreadcrumbLink`
+
+The `SentryBreadcrumbLink` adds breadcrumbs for every succesful GraphQL operation. Failed operations can be added as breadcrumbs via `SentryLink.link()`.
 
 ## `SentryResponseParser` and `SentryRequestSerializer` 
 
 The `SentryResponseParser` and `SentryRequestSerializer` classes can be used to trace the serialization process. 
-Both classes work with `HttpLink` and `DioLink`. 
+Both classes work with [`HttpLink`](https://pub.dev/packages/gql_http_link) and [`DioLink`](https://pub.dev/packages/gql_dio_link). 
 When using the `HttpLink`, you can additionally use the `sentryResponseDecoder` function.
+
+### `HttpLink` example
 
 ```dart
 import 'package:sentry_link/sentry_link.dart';
@@ -46,11 +60,27 @@ final link = Link.from([
       parser: SentryResponseParser(),
     ),
   ]);
+```
 
-  final client = GraphQLClient(
-    cache: GraphQLCache(),
-    link: link,
-  );
+### `DioLink` example
+
+This example also uses the [`sentry_dio`](https://pub.dev/packages/sentry_dio) integration.
+
+```dart
+import 'package:sentry_link/sentry_link.dart';
+import 'package:sentry_dio/sentry_dio.dart';
+
+final link = Link.from([
+    SentryLink.link(),
+    AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
+    SentryTracingLink(shouldStartTransaction: true),
+    DioLink(
+      'https://api.github.com/graphql',
+      client: Dio()..addSentry(networkTracing: true),
+      serializer: SentryRequestSerializer(),
+      parser: SentryResponseParser(),
+    ),
+  ]);
 ```
 
 <details>
@@ -69,8 +99,8 @@ import 'package:sentry_link/sentry_link.dart';
 
 final link = Link.from([
   SentryLink.link(),
-  AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
   SentryTracingLink(shouldStartTransaction: true),
+  AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
   HttpLink(
     'https://api.github.com/graphql',
     httpClient: SentryHttpClient(networkTracing: true),
@@ -79,11 +109,6 @@ final link = Link.from([
     httpResponseDecoder: sentryResponseDecoder,
   ),
 ]);
-
-final client = GraphQLClient(
-  cache: GraphQLCache(),
-  link: link,
-);
 
 Map<String, dynamic>? sentryResponseDecoder(
   http.Response response, {

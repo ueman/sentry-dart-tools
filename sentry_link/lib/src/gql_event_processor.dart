@@ -5,10 +5,16 @@ import 'package:sentry/sentry.dart';
 // ignore: implementation_imports
 import 'package:sentry/src/sentry_exception_factory.dart';
 
-class GqlEventProcessor extends EventProcessor {
-  GqlEventProcessor(this._options);
+import 'package:sentry_link/src/extension.dart';
 
-  final SentryOptions _options;
+class GqlEventProcessor extends EventProcessor {
+  GqlEventProcessor({Hub? hub}) : _hub = hub ?? HubAdapter();
+
+  final Hub _hub;
+
+  // ignore: invalid_use_of_internal_member
+  SentryOptions get _options => _hub.options;
+
   SentryExceptionFactory get _sentryExceptionFactory =>
       // ignore: invalid_use_of_internal_member
       _options.exceptionFactory;
@@ -32,9 +38,19 @@ class GqlEventProcessor extends EventProcessor {
 
     final sentryExceptions = <SentryException>[];
 
+    _addGraphQlErrors(throwable, sentryExceptions);
+
     for (final e in exceptions) {
-      sentryExceptions.add(_sentryExceptionFactory
-          .getSentryException(e.exception, stackTrace: e.stackTrace));
+      sentryExceptions.add(
+        _sentryExceptionFactory.getSentryException(
+          e.exception,
+          stackTrace: e.stackTrace,
+        ),
+      );
+      final error = e.exception;
+      if (error != null) {
+        _addGraphQlErrors(error, sentryExceptions);
+      }
     }
 
     return event.copyWith(
@@ -43,6 +59,22 @@ class GqlEventProcessor extends EventProcessor {
         ...sentryExceptions,
       ],
     );
+  }
+
+  void _addGraphQlErrors(
+    Object exception,
+    List<SentryException> sentryExceptions,
+  ) {
+    if (exception is! ServerException) {
+      return;
+    }
+    final exceptions =
+        exception.parsedResponse?.errors?.toSentryExceptionsWithoutRequest(
+      exception.parsedResponse!,
+    );
+    if (exceptions != null) {
+      sentryExceptions.addAll(exceptions);
+    }
   }
 }
 

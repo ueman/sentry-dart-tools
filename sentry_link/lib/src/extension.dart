@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:gql/ast.dart';
 import 'package:gql_exec/gql_exec.dart';
 import 'package:sentry/sentry.dart';
 import 'package:gql/language.dart' show printNode;
@@ -8,7 +9,14 @@ extension GraphQLErrorListX on List<GraphQLError> {
   List<SentryException> toSentryExceptions(Request request, Response response) {
     return map((e) => e.toSentryException(response, request))
         .where((element) => element != null)
-        .cast<SentryException>()
+        .whereType<SentryException>()
+        .toList();
+  }
+
+  List<SentryException> toSentryExceptionsWithoutRequest(Response response) {
+    return map((e) => e.toSentryExceptionWithoutRequest(response))
+        .where((element) => element != null)
+        .whereType<SentryException>()
         .toList();
   }
 }
@@ -34,23 +42,37 @@ extension GraphQLErrorX on GraphQLError {
     final lines = printNode(request.operation.document).split('\n');
     final contextLine = lines[contextLineNumber];
     return SentryException(
-      type: message,
+      // It's common that GraphQL errors have an extension with an error code
+      // therefore try to use it.
+      type: extensions?['code']?.toString() ?? message,
       value: message,
       mechanism: Mechanism(type: 'GraphQlError', data: extensions),
-      stackTrace: SentryStackTrace(frames: [
-        SentryStackFrame(
-          fileName: request.operation.operationName ?? 'Unnamed Query',
-          lineNo: contextLineNumber,
-          colNo: contextLineColumn,
-          preContext: lines.take(contextLineNumber).toList(),
-          contextLine: contextLine,
-          postContext: lines.skip(contextLineNumber + 1).toList(),
-          vars: request.variables
-              .map((key, value) => MapEntry(key, value.toString())),
-          inApp: false,
-          platform: 'other',
-        )
-      ]),
+      stackTrace: SentryStackTrace(
+        frames: [
+          SentryStackFrame(
+            fileName: request.operation.operationName ?? 'Unnamed Query',
+            lineNo: contextLineNumber,
+            colNo: contextLineColumn,
+            preContext: lines.take(contextLineNumber).toList(),
+            contextLine: contextLine,
+            postContext: lines.skip(contextLineNumber + 1).toList(),
+            vars: request.variables
+                .map((key, value) => MapEntry(key, value.toString())),
+            inApp: false,
+            platform: 'other',
+          )
+        ],
+      ),
+    );
+  }
+
+  SentryException? toSentryExceptionWithoutRequest(Response response) {
+    return SentryException(
+      // It's common that GraphQL errors have an extension with an error code
+      // therefore try to use it.
+      type: extensions?['code']?.toString() ?? message,
+      value: message,
+      mechanism: Mechanism(type: 'GraphQlError', data: extensions),
     );
   }
 }
@@ -80,4 +102,25 @@ extension OperationX on Operation {
       'document': json.encode(printNode(document)),
     };
   }
+}
+
+// Can be removed when
+// https://github.com/gql-dart/gql/issues/360
+// is fixed.
+extension RequestTypeExtension on Request {
+  OperationType get type {
+    final definitions = operation.document.definitions
+        .whereType<OperationDefinitionNode>()
+        .toList();
+    if (definitions.length != 1 && operation.operationName != null) {
+      definitions.removeWhere(
+        (node) => node.name!.value != operation.operationName,
+      );
+    }
+
+    assert(definitions.length == 1);
+    return definitions.first.type;
+  }
+
+  bool get isQuery => type == OperationType.query;
 }

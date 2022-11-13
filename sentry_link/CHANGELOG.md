@@ -1,4 +1,8 @@
-## 0.1.1
+## 0.1.2
+
+- Add ability to add breadcrumbs for GraphQL operations
+
+## 0.1.2
 
 - Update `gql` dependencies
 - Add inner exceptions for event processor

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:gql/ast.dart';
 import 'package:gql_exec/gql_exec.dart';
 import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
+import 'package:sentry_link/src/extension.dart';
 
 class SentryTracingLink extends Link {
   /// If [shouldStartTransaction] is set to true, an [SentryTransaction]
@@ -74,25 +74,4 @@ class SentryTracingLink extends Link {
     }
     return null;
   }
-}
-
-// Can be removed when
-// https://github.com/gql-dart/gql/issues/360
-// is fixed.
-extension on Request {
-  OperationType get type {
-    final definitions = operation.document.definitions
-        .whereType<OperationDefinitionNode>()
-        .toList();
-    if (operation.operationName != null) {
-      definitions.removeWhere(
-        (node) => node.name!.value != operation.operationName,
-      );
-    }
-
-    assert(definitions.length == 1);
-    return definitions.first.type;
-  }
-
-  bool get isQuery => type == OperationType.query;
 }
