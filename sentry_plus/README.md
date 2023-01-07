@@ -28,28 +28,7 @@ Future<void> main() {
 
 ## File tracing
 
-This enables automatic creation of performance traces for most file IO.
-It includes traces for reading, writing, modifying and deleting files.
-
-This is only available on non-web platforms.
-
-```dart
-import 'package:sentry_plus/sentry_plus.dart';
-
-Future<void> main() {
-  // also works for SentryFlutter.init
-  return Sentry.init(
-    (options) {
-      // Add tracing for files
-      options.addFileTracing();
-      // other configuration omitted
-    },
-    appRunner: () {
-        // app code
-    },
-  );
-}
-```
+Use the [official file tracing package from Sentry](https://pub.dev/packages/sentry_file).
 
 ## HTTP tracing
 
