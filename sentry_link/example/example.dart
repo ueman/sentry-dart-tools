@@ -10,8 +10,9 @@ Future<void> main() {
   return Sentry.init(
     (options) {
       options.dsn = 'sentry_dsn';
-      options.addEventProcessor(GqlEventProcessor(options));
+      options.addEventProcessor(GqlEventProcessor());
       options.tracesSampleRate = 1;
+      options.beforeBreadcrumb = graphQlFilter();
     },
     appRunner: example,
   );

@@ -150,6 +150,18 @@ That can be achieved in two ways:
 
 1. Disable all HTTP breadcrumbs.
 2. Use [`beforeBreadcrumb`](https://pub.dev/documentation/sentry/latest/sentry_io/SentryOptions/beforeBreadcrumb.html).
+  ```dart
+  return Sentry.init(
+    (options) {
+      options.beforeBreadcrumb = graphQlFilter();
+      // or 
+      options.beforeBreadcrumb = graphQlFilter((breadcrumb, hint) {
+        // custom filter
+        return breadcrumb;
+      });
+    },
+  );
+  ```
 
 ## 📣 About the author
 
