@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Added filter for http breadcrumbs.
+
 ## 0.1.2
 
 - Add ability to add breadcrumbs for GraphQL operations
