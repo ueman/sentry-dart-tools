@@ -10,9 +10,9 @@ Future<void> main() {
   return Sentry.init(
     (options) {
       options.dsn = 'sentry_dsn';
-      options.addEventProcessor(GqlEventProcessor());
       options.tracesSampleRate = 1;
       options.beforeBreadcrumb = graphQlFilter();
+      options.addGqlExtractors();
     },
     appRunner: example,
   );
@@ -25,7 +25,7 @@ Future<void> example() async {
     SentryTracingLink(shouldStartTransaction: true),
     HttpLink(
       'https://api.github.com/graphql',
-      httpClient: SentryHttpClient(networkTracing: true),
+      httpClient: SentryHttpClient(),
       parser: SentryResponseParser(),
       serializer: SentryRequestSerializer(),
     ),

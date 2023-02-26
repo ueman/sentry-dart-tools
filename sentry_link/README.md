@@ -163,6 +163,17 @@ That can be achieved in two ways:
   );
   ```
 
+# Improve exception reports for `LinkException`
+
+`LinkException` can be arbitrary deeply nested. By adding an exception extractor for it,
+Sentry can create significantly improved exception reports.
+
+```dart
+Sentry.init((options) {
+  options.addGqlExtractors();
+});
+```
+
 ## 📣 About the author
 
 - [![Twitter Follow](https://img.shields.io/twitter/follow/ue_man?style=social)](https://twitter.com/ue_man)
