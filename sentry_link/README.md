@@ -141,6 +141,16 @@ Map<String, dynamic>? _defaultHttpResponseDecoder(http.Response httpResponse) {
 
 </details>
 
+# Filter redundant HTTP breadcrumbs
+
+If you use the [`sentry_dio`](https://pub.dev/packages/sentry_dio) or [`http`](https://pub.dev/documentation/sentry/latest/sentry_io/SentryHttpClient-class.html) you will have breadcrumbs attached for every HTTP request. In order to not have duplicated breadcrumbs from the HTTP integrations and this GraphQL integration,
+you should filter those breadcrumbs.
+
+That can be achieved in two ways:
+
+1. Disable all HTTP breadcrumbs.
+2. Use [`beforeBreadcrumb`](https://pub.dev/documentation/sentry/latest/sentry_io/SentryOptions/beforeBreadcrumb.html).
+
 ## 📣 About the author
 
 - [![Twitter Follow](https://img.shields.io/twitter/follow/ue_man?style=social)](https://twitter.com/ue_man)
