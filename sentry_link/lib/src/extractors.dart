@@ -1,10 +1,10 @@
 import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
 
-// Unfortunately, because extractors are looked up via `Type`, each exception
-// needs its own extractor.
-// That are quite a bit, so we make it easy by exposing a method which
-// adds all of them.
+// Unfortunately, because extractors are looked up via `Type` in map,
+// each exception needs its own extractor.
+// The extractors are quite a few, so we make it easy to add by exposing a
+// method which adds all of the extractors.
 extension GqlExctractors on SentryOptions {
   void addGqlExtractors() {
     addExceptionCauseExtractor(RequestFormatExceptionExtractor());
