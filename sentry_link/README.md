@@ -4,7 +4,7 @@
 
 ## Compatibility list
 
-This integration is compatible with the following packages. It's also compatible with other packages which are build on `gql` suite of packages.
+This integration is compatible with the following packages. It's also compatible with other packages which are build on [`gql`](https://pub.dev/publishers/gql-dart.dev/packages) suite of packages.
 
 | package | stats |
 |---------|-------|
@@ -15,7 +15,7 @@ This integration is compatible with the following packages. It's also compatible
 
 ## Usage
 
-Just add `SentryLink.link()` and/or `SentryTracingLink` to your links.
+Just add `SentryGql.link()` to your links.
 It will add error reporting and performance monitoring to your GraphQL operations.
 
 ```dart
@@ -35,10 +35,9 @@ final link = Link.from([
 A GraphQL error will be reported like the following screenshot: 
 <img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
 
-# Improve exception reports for `LinkException`
+## Improve exception reports for `LinkException`s
 
-`LinkException` can be arbitrary deeply nested. By adding an exception extractor for it,
-Sentry can create significantly improved exception reports.
+`LinkException`s and it subclasses can be arbitrary deeply nested. By adding an exception extractor for it, Sentry can create significantly improved exception reports.
 
 ```dart
 Sentry.init((options) {
@@ -46,15 +45,11 @@ Sentry.init((options) {
 });
 ```
 
-## `SentryBreadcrumbLink`
+## Performance traces for serialization and parsing
 
-The `SentryBreadcrumbLink` adds breadcrumbs for every succesful GraphQL operation. Failed operations can be added as breadcrumbs via `SentryLink.link()`.
-
-## `SentryResponseParser` and `SentryRequestSerializer` 
-
-The `SentryResponseParser` and `SentryRequestSerializer` classes can be used to trace the serialization process. 
-Both classes work with [`HttpLink`](https://pub.dev/packages/gql_http_link) and [`DioLink`](https://pub.dev/packages/gql_dio_link). 
-When using the `HttpLink`, you can additionally use the `sentryResponseDecoder` function.
+The [`SentryResponseParser`](https://pub.dev/documentation/sentry_link/latest/sentry_link/SentryResponseParser-class.html) and [`SentryRequestSerializer`](https://pub.dev/documentation/sentry_link/latest/sentry_link/SentryRequestSerializer-class.html) classes can be used to trace the de/serialization process. 
+Both classes work with the [`HttpLink`](https://pub.dev/packages/gql_http_link) and the [`DioLink`](https://pub.dev/packages/gql_dio_link). 
+When using the `HttpLink`, you can additionally use the `sentryResponseDecoder` function as explained further down below.
 
 ### Example for `HttpLink`
 
@@ -101,7 +96,7 @@ final link = Link.from([
 <details>
   <summary>HttpLink</summary>
 
-# Bonus `HttpLink` tracing
+## Bonus `HttpLink` tracing
 
 ```dart
 import 'dart:async';
@@ -156,7 +151,7 @@ Map<String, dynamic>? _defaultHttpResponseDecoder(http.Response httpResponse) {
 
 </details>
 
-# Filter redundant HTTP breadcrumbs
+## Filter redundant HTTP breadcrumbs
 
 If you use the [`sentry_dio`](https://pub.dev/packages/sentry_dio) or [`http`](https://pub.dev/documentation/sentry/latest/sentry_io/SentryHttpClient-class.html) you will have breadcrumbs attached for every HTTP request. In order to not have duplicated breadcrumbs from the HTTP integrations and this GraphQL integration,
 you should filter those breadcrumbs.
@@ -178,7 +173,55 @@ That can be achieved in two ways:
   );
   ```
 
-## 📣 About the author
+## Additional `graphql` usage hints
+
+<details>
+  <summary>Additional hints for usage with `graphql`</summary>
+
+```dart
+import 'package:sentry/sentry.dart';
+import 'package:sentry_link/sentry_link.dart';
+import 'package:graphql/graphql.dart';
+
+Sentry.init((options) {
+  options.addExceptionCauseExtractor(UnknownExceptionExtractor());
+  options.addExceptionCauseExtractor(NetworkExceptionExtractor());
+  options.addExceptionCauseExtractor(CacheMissExceptionExtractor());
+  options.addExceptionCauseExtractor(OperationExceptionExtractor());
+  options.addExceptionCauseExtractor(CacheMisconfigurationExceptionExtractor());
+  options.addExceptionCauseExtractor(MismatchedDataStructureExceptionExtractor());
+  options.addExceptionCauseExtractor(UnexpectedResponseStructureExceptionExtractor());
+});
+
+class UnknownExceptionExtractor
+    extends LinkExceptionExtractor<UnknownException> {}
+
+class NetworkExceptionExtractor
+    extends LinkExceptionExtractor<NetworkException> {}
+
+class CacheMissExceptionExtractor
+    extends LinkExceptionExtractor<CacheMissException> {}
+
+class CacheMisconfigurationExceptionExtractor
+    extends LinkExceptionExtractor<CacheMisconfigurationException> {}
+
+class MismatchedDataStructureExceptionExtractor
+    extends LinkExceptionExtractor<MismatchedDataStructureException> {}
+
+class UnexpectedResponseStructureExceptionExtractor
+    extends LinkExceptionExtractor<UnexpectedResponseStructureException> {}
+
+class OperationExceptionExtractor extends ExceptionCauseExtractor<T> {
+  @override
+  ExceptionCause? cause(T error) {
+    return ExceptionCause(error.linkException, error.originalStackTrace);
+  }
+}
+```
+
+</details>
+
+# 📣 About the author
 
 - [![Twitter Follow](https://img.shields.io/twitter/follow/ue_man?style=social)](https://twitter.com/ue_man)
 - [![GitHub followers](https://img.shields.io/github/followers/ueman?style=social)](https://github.com/ueman)

@@ -1,3 +1,11 @@
+## 0.2.0-dev.0
+
+This version contains a lot of breaking changes
+
+- Require Sentry v7
+- Instead of multiple `Link`s, there's now just a single one. See the readme for usage instructions
+- Add exception extractors for unwrapping of nested `LinkException`
+- Add a filter to remove duplicated http breadcrumbs. See readme for usage instructions
 ## 0.1.3
 
 - Added filter for http breadcrumbs.
