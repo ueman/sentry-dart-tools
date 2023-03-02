@@ -22,17 +22,29 @@ It will add error reporting and performance monitoring to your GraphQL operation
 final link = Link.from([
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
     // SentryLink records exceptions
-    SentryLink.link(),
+    SentryGql.link(
+      shouldStartTransaction: true,
+      graphQlErrorsMarkTransactionAsFailed: true,
+    ),
     // SentryTracingLink adds performance tracing with Sentry
     SentryTracingLink(shouldStartTransaction: true),
     HttpLink('https://api.github.com/graphql'),
 ]);
 ```
 
-In addition to that, you can add `GqlEventProcessor` to Sentry's event processor, to improve support for nested [`LinkException`](https://pub.dev/documentation/gql_link/latest/link/LinkException-class.html)s and its subclasses.
-
 A GraphQL error will be reported like the following screenshot: 
 <img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
+
+# Improve exception reports for `LinkException`
+
+`LinkException` can be arbitrary deeply nested. By adding an exception extractor for it,
+Sentry can create significantly improved exception reports.
+
+```dart
+Sentry.init((options) {
+  options.addGqlExtractors();
+});
+```
 
 ## `SentryBreadcrumbLink`
 
@@ -44,9 +56,12 @@ The `SentryResponseParser` and `SentryRequestSerializer` classes can be used to 
 Both classes work with [`HttpLink`](https://pub.dev/packages/gql_http_link) and [`DioLink`](https://pub.dev/packages/gql_dio_link). 
 When using the `HttpLink`, you can additionally use the `sentryResponseDecoder` function.
 
-### `HttpLink` example
+### Example for `HttpLink`
+
+This example uses the [`http`](https://docs.sentry.io/platforms/dart/configuration/integrations/http-integration/#performance-monitoring-for-http-requests) integration in addition to this gql integration.
 
 ```dart
+import 'package:sentry/sentry.dart';
 import 'package:sentry_link/sentry_link.dart';
 
 final link = Link.from([
@@ -62,9 +77,9 @@ final link = Link.from([
   ]);
 ```
 
-### `DioLink` example
+### Example for `DioLink`
 
-This example also uses the [`sentry_dio`](https://pub.dev/packages/sentry_dio) integration.
+This example uses the [`sentry_dio`](https://pub.dev/packages/sentry_dio) integration in addition  to this gql integration.
 
 ```dart
 import 'package:sentry_link/sentry_link.dart';
@@ -76,7 +91,7 @@ final link = Link.from([
     SentryTracingLink(shouldStartTransaction: true),
     DioLink(
       'https://api.github.com/graphql',
-      client: Dio()..addSentry(networkTracing: true),
+      client: Dio()..addSentry(),
       serializer: SentryRequestSerializer(),
       parser: SentryResponseParser(),
     ),
@@ -162,17 +177,6 @@ That can be achieved in two ways:
     },
   );
   ```
-
-# Improve exception reports for `LinkException`
-
-`LinkException` can be arbitrary deeply nested. By adding an exception extractor for it,
-Sentry can create significantly improved exception reports.
-
-```dart
-Sentry.init((options) {
-  options.addGqlExtractors();
-});
-```
 
 ## 📣 About the author
 

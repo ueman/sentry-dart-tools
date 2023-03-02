@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:graphql/client.dart';
 import 'package:sentry/sentry.dart';
 import 'package:sentry_link/sentry_link.dart';
-import 'package:sentry_link/src/sentry_gql.dart';
 
 const personalAccessToken = 'token';
 
