@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:graphql/client.dart';
 import 'package:sentry/sentry.dart';
 import 'package:sentry_link/sentry_link.dart';
+import 'package:sentry_link/src/sentry_gql.dart';
 
 const personalAccessToken = 'token';
 
@@ -20,9 +21,11 @@ Future<void> main() {
 
 Future<void> example() async {
   final link = Link.from([
-    SentryLink.link(),
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
-    SentryTracingLink(shouldStartTransaction: true),
+    SentryGql.link(
+      shouldStartTransaction: true,
+      graphQlErrorsMarkTransactionAsFailed: true,
+    ),
     HttpLink(
       'https://api.github.com/graphql',
       httpClient: SentryHttpClient(),

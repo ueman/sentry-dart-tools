@@ -55,7 +55,7 @@ final link = Link.from([
     SentryTracingLink(shouldStartTransaction: true),
     HttpLink(
       'https://api.github.com/graphql',
-      httpClient: SentryHttpClient(networkTracing: true),
+      httpClient: SentryHttpClient(),
       serializer: SentryRequestSerializer(),
       parser: SentryResponseParser(),
     ),
