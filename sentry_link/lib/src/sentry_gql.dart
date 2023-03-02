@@ -1,7 +1,9 @@
 import 'package:gql_link/gql_link.dart';
-import 'package:sentry_link/sentry_link.dart';
 import 'package:gql_exec/gql_exec.dart';
 import 'package:sentry/sentry.dart';
+import 'package:sentry_link/src/sentry_breadcrumb_link.dart';
+import 'package:sentry_link/src/sentry_link.dart';
+import 'package:sentry_link/src/sentry_tracing_link.dart';
 
 abstract class SentryGql {
   SentryGql._();
