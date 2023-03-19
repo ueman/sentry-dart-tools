@@ -1,3 +1,7 @@
+## 0.2.1
+
+- fix readme
+
 ## 0.2.0
 
 This version contains breaking changes

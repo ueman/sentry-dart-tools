@@ -26,8 +26,6 @@ final link = Link.from([
       shouldStartTransaction: true,
       graphQlErrorsMarkTransactionAsFailed: true,
     ),
-    // SentryTracingLink adds performance tracing with Sentry
-    SentryTracingLink(shouldStartTransaction: true),
     HttpLink('https://api.github.com/graphql'),
 ]);
 ```
@@ -60,9 +58,11 @@ import 'package:sentry/sentry.dart';
 import 'package:sentry_link/sentry_link.dart';
 
 final link = Link.from([
-    SentryLink.link(),
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
-    SentryTracingLink(shouldStartTransaction: true),
+    SentryGql.link(
+      shouldStartTransaction: true,
+      graphQlErrorsMarkTransactionAsFailed: true,
+    ),
     HttpLink(
       'https://api.github.com/graphql',
       httpClient: SentryHttpClient(),
@@ -81,9 +81,11 @@ import 'package:sentry_link/sentry_link.dart';
 import 'package:sentry_dio/sentry_dio.dart';
 
 final link = Link.from([
-    SentryLink.link(),
     AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
-    SentryTracingLink(shouldStartTransaction: true),
+    SentryGql.link(
+      shouldStartTransaction: true,
+      graphQlErrorsMarkTransactionAsFailed: true,
+    ),
     DioLink(
       'https://api.github.com/graphql',
       client: Dio()..addSentry(),
@@ -108,9 +110,11 @@ import 'package:http/http.dart' as http;
 import 'package:sentry_link/sentry_link.dart';
 
 final link = Link.from([
-  SentryLink.link(),
-  SentryTracingLink(shouldStartTransaction: true),
   AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
+  SentryGql.link(
+    shouldStartTransaction: true,
+    graphQlErrorsMarkTransactionAsFailed: true,
+  ),
   HttpLink(
     'https://api.github.com/graphql',
     httpClient: SentryHttpClient(networkTracing: true),
@@ -176,7 +180,11 @@ That can be achieved in two ways:
 ## Additional `graphql` usage hints
 
 <details>
-  <summary>Additional hints for usage with `graphql`</summary>
+  <summary>
+
+Additional hints for usage with [`graphql`](https://pub.dev/packages/graphql)
+
+  </summary>
 
 ```dart
 import 'package:sentry/sentry.dart';
