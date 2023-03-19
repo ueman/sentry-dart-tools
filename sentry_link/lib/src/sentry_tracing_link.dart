@@ -6,17 +6,32 @@ import 'package:sentry/sentry.dart';
 import 'package:sentry_link/src/extension.dart';
 
 class SentryTracingLink extends Link {
-  /// If [shouldStartTransaction] is set to true, an [SentryTransaction]
+  /// If [shouldStartTransaction] is set to true, a [SentryTransaction]
   /// is automatically created for each GraphQL query/mutation.
   /// If a transaction is already bound to scope, no [SentryTransaction]
   /// will be started even if [shouldStartTransaction] is set to true.
+  ///
+  /// If [graphQlErrorsMarkTransactionAsFailed] is set to true and a
+  /// query or mutation have a [GraphQLError] attached, the current
+  /// [SentryTransaction] is marked as with [SpanStatus.unknownError].
   SentryTracingLink({
     required this.shouldStartTransaction,
+    required this.graphQlErrorsMarkTransactionAsFailed,
     Hub? hub,
   }) : _hub = hub ?? HubAdapter();
 
   final Hub _hub;
+
+  /// If [shouldStartTransaction] is set to true, a [SentryTransaction]
+  /// is automatically created for each GraphQL query/mutation.
+  /// If a transaction is already bound to scope, no [SentryTransaction]
+  /// will be started even if [shouldStartTransaction] is set to true.
   final bool shouldStartTransaction;
+
+  /// If [graphQlErrorsMarkTransactionAsFailed] is set to true and a
+  /// query or mutation have a [GraphQLError] attached, the current
+  /// [SentryTransaction] is marked as with [SpanStatus.unknownError].
+  final bool graphQlErrorsMarkTransactionAsFailed;
 
   @override
   Stream<Response> request(Request request, [NextLink? forward]) {
@@ -38,8 +53,13 @@ class SentryTracingLink extends Link {
     );
     return forward!(request).transform(StreamTransformer.fromHandlers(
       handleData: (data, sink) {
-        // todo: mark trx as failed when server responds with graphql errors?
-        unawaited(transaction?.finish(status: const SpanStatus.ok()));
+        final hasGraphQlError = data.errors?.isNotEmpty ?? false;
+        if (graphQlErrorsMarkTransactionAsFailed && hasGraphQlError) {
+          transaction?.finish(status: const SpanStatus.unknownError());
+        } else {
+          transaction?.finish(status: const SpanStatus.ok());
+        }
+
         sink.add(data);
       },
       handleError: (error, stackTrace, sink) {
@@ -50,7 +70,7 @@ class SentryTracingLink extends Link {
         // `HttpLinkResponseContext.statusCode` or
         // `DioLinkResponseContext.statusCode`
         transaction?.throwable = error;
-        transaction?.finish(status: const SpanStatus.unknownError());
+        unawaited(transaction?.finish(status: const SpanStatus.unknownError()));
 
         sink.addError(error, stackTrace);
       },
@@ -64,11 +84,7 @@ class SentryTracingLink extends Link {
   ) {
     final span = _hub.getSpan();
     if (span == null && shouldStartTransaction) {
-      return _hub.startTransaction(
-        description,
-        op,
-        bindToScope: true,
-      );
+      return _hub.startTransaction(description, op, bindToScope: true);
     } else if (span != null) {
       return span.startChild(op, description: description);
     }
