@@ -1,0 +1,22 @@
+name: sentry_connectivity
+description: A package wich adds breadcrumbs for network changes.
+version: 1.0.0
+repository: https://github.com/ueman/sentry-dart-tools
+issue_tracker: https://github.com/ueman/sentry-dart-tools/issues
+
+environment:
+  sdk: '>=2.17.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  connectivity_plus: ^3.0.3
+  flutter:
+    sdk: flutter
+  sentry_flutter: ^7.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
