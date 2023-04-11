@@ -1,14 +1,14 @@
 name: sentry_dart_frog
 description: Sentry integration for dart_frog. Capture errors and trace performance
-version: 0.0.1
+version: 0.1.0
 repository: https://github.com/ueman/sentry-dart-tools/tree/main/sentry_dart_frog
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
-  dart_frog: ^0.1.0
-  sentry: ^6.9.0
+  dart_frog: ^0.3.0
+  sentry: ^7.4.1
 
 dev_dependencies:
   lints: ^2.0.0
