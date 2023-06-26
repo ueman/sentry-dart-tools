@@ -70,30 +70,11 @@ class SentryLinkHandler {
         },
       ));
     } else if (reportGraphQLErrors) {
-      final exceptions = errors.toSentryExceptions(request, response);
-      if (exceptions.isNotEmpty) {
-        // try to format it nicely
-        await hub.captureEvent(
-          SentryEvent(
-            exceptions: response.errors?.toSentryExceptions(request, response),
-            level: SentryLevel.error,
-          ),
-        );
-      } else {
-        // we couldn't format it nicely
-        await hub.captureEvent(
-          SentryEvent(
-            exceptions: response.errors?.toSentryExceptions(request, response),
-            level: SentryLevel.error,
-            contexts: Contexts()
-              ..['GraphQL'] = <String, dynamic>{
-                'request': request.toJson(),
-                'response': response.toJson(),
-              },
-          ),
-        );
-      }
+      final event = _eventFromRequestAndResponse(request, response);
+
+      await hub.captureEvent(event);
     }
+
     yield response;
   }
 
@@ -111,18 +92,29 @@ class SentryLinkHandler {
         data: request.toJson(),
       ));
     } else if (reportExceptions) {
-      await hub.captureException(
-        exception,
-        withScope: (scope) {
-          scope.setContexts(
-            'GraphQL',
-            <String, dynamic>{
-              'request': request.toJson(),
-            },
-          );
-        },
-      );
+      Response? response;
+      if (exception is ServerException) {
+        response = exception.parsedResponse;
+      }
+
+      final event = _eventFromRequestAndResponse(request, response);
+
+      await hub.captureEvent(event);
     }
     yield* Stream.error(exception);
   }
+}
+
+SentryEvent _eventFromRequestAndResponse(Request request, Response? response) {
+  final sentryRequest = request.toSentryRequest();
+  final operationName = request.operation.operationName ?? 'unnamed operation';
+
+  final sentryResponse = response?.toSentryResponse();
+
+  return SentryEvent(
+    message: SentryMessage('Error during $operationName'),
+    level: SentryLevel.error,
+    request: sentryRequest,
+    contexts: Contexts(response: sentryResponse),
+  );
 }
