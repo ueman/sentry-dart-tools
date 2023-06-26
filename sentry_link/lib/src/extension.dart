@@ -5,22 +5,6 @@ import 'package:gql_exec/gql_exec.dart';
 import 'package:sentry/sentry.dart';
 import 'package:gql/language.dart' show printNode;
 
-extension GraphQLErrorListX on List<GraphQLError> {
-  List<SentryException> toSentryExceptions(Request request, Response response) {
-    return map((e) => e.toSentryException(response, request))
-        .where((element) => element != null)
-        .whereType<SentryException>()
-        .toList();
-  }
-
-  List<SentryException> toSentryExceptionsWithoutRequest(Response response) {
-    return map((e) => e.toSentryExceptionWithoutRequest(response))
-        .where((element) => element != null)
-        .whereType<SentryException>()
-        .toList();
-  }
-}
-
 extension GraphQLErrorX on GraphQLError {
   Map<String, dynamic> toJson() {
     return {
@@ -31,50 +15,6 @@ extension GraphQLErrorX on GraphQLError {
       'extensions': extensions,
     };
   }
-
-  SentryException? toSentryException(Response response, Request request) {
-    final locations = this.locations;
-    if (locations == null) {
-      return null;
-    }
-    final contextLineNumber = locations.first.line - 1;
-    final contextLineColumn = locations.first.column;
-    final lines = printNode(request.operation.document).split('\n');
-    final contextLine = lines[contextLineNumber];
-    return SentryException(
-      // It's common that GraphQL errors have an extension with an error code
-      // therefore try to use it.
-      type: extensions?['code']?.toString() ?? message,
-      value: message,
-      mechanism: Mechanism(type: 'GraphQlError', data: extensions),
-      stackTrace: SentryStackTrace(
-        frames: [
-          SentryStackFrame(
-            fileName: request.operation.operationName ?? 'Unnamed Query',
-            lineNo: contextLineNumber,
-            colNo: contextLineColumn,
-            preContext: lines.take(contextLineNumber).toList(),
-            contextLine: contextLine,
-            postContext: lines.skip(contextLineNumber + 1).toList(),
-            vars: request.variables
-                .map((key, value) => MapEntry(key, value.toString())),
-            inApp: false,
-            platform: 'other',
-          )
-        ],
-      ),
-    );
-  }
-
-  SentryException? toSentryExceptionWithoutRequest(Response response) {
-    return SentryException(
-      // It's common that GraphQL errors have an extension with an error code
-      // therefore try to use it.
-      type: extensions?['code']?.toString() ?? message,
-      value: message,
-      mechanism: Mechanism(type: 'GraphQlError', data: extensions),
-    );
-  }
 }
 
 extension RequestX on Request {
@@ -84,6 +24,17 @@ extension RequestX on Request {
       'variables': variables,
     };
   }
+
+  SentryRequest toSentryRequest() {
+    return SentryRequest(
+      apiTarget: 'graphql',
+      data: {
+        'query': printNode(operation.document),
+        'variables': variables,
+        'operationName': operation.operationName
+      },
+    );
+  }
 }
 
 extension ResponseX on Response {
@@ -92,6 +43,15 @@ extension ResponseX on Response {
       'errors': errors?.map((e) => e.toJson()).toList(),
       'data': data,
     };
+  }
+
+  SentryResponse toSentryResponse() {
+    return SentryResponse(
+      data: {
+        'errors': errors?.map((e) => e.toJson()).toList(),
+        'data': data,
+      },
+    );
   }
 }
 
