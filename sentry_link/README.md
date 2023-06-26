@@ -30,7 +30,23 @@ final link = Link.from([
 ]);
 ```
 
-A GraphQL error will be reported like the following screenshot: 
+A GraphQL errors will be reported as seen in the example below: 
+
+Given the following query with an error
+
+```graphql
+query LoadPosts($id: ID!) {
+  post(id: $id) {
+    id
+    # This word is intentionally misspelled to trigger a GraphQL error
+    titl
+    body
+  }
+}
+```
+
+it will be represented in Sentry as seen in the image
+
 <img src="https://raw.githubusercontent.com/ueman/sentry-dart-tools/main/sentry_link/screenshot.png" />
 
 ## Improve exception reports for `LinkException`s
