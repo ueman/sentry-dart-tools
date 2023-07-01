@@ -1,6 +1,6 @@
 name: sentry_link
 description: Automatic capture of exceptions and GraphQL errors for the gql eco-system, like graphql and ferry
-version: 0.2.1
+version: 0.3.0
 repository: https://github.com/ueman/sentry-dart-tools
 issue_tracker: https://github.com/ueman/sentry-dart-tools/issues
 
@@ -8,11 +8,11 @@ environment:
   sdk: '>=2.17.0 <4.0.0'
 
 dependencies:
-  gql_error_link: ^0.2.0
-  gql_exec: ^0.4.0
-  gql_link: ^0.5.0
-  gql: ^0.14.0
-  sentry: ^7.0.0
+  gql_error_link: ">=0.2.0 < 2.0.0"
+  gql_exec: ">=0.4.0 < 2.0.0"
+  gql_link: ">=0.5.0 < 2.0.0"
+  gql: ">=0.14.0 < 2.0.0"
+  sentry: ^7.8.0
 
 dev_dependencies:
   lints: ^1.0.0

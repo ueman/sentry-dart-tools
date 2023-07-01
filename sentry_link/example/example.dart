@@ -4,8 +4,6 @@ import 'package:graphql/client.dart';
 import 'package:sentry/sentry.dart';
 import 'package:sentry_link/sentry_link.dart';
 
-const personalAccessToken = 'token';
-
 Future<void> main() {
   return Sentry.init(
     (options) {
@@ -13,6 +11,7 @@ Future<void> main() {
       options.tracesSampleRate = 1;
       options.beforeBreadcrumb = graphQlFilter();
       options.addGqlExtractors();
+      options.addSentryLinkInAppExcludes();
     },
     appRunner: example,
   );
@@ -20,13 +19,12 @@ Future<void> main() {
 
 Future<void> example() async {
   final link = Link.from([
-    AuthLink(getToken: () async => 'Bearer $personalAccessToken'),
     SentryGql.link(
       shouldStartTransaction: true,
       graphQlErrorsMarkTransactionAsFailed: true,
     ),
     HttpLink(
-      'https://api.github.com/graphql',
+      'https://graphqlzero.almansi.me/api',
       httpClient: SentryHttpClient(),
       parser: SentryResponseParser(),
       serializer: SentryRequestSerializer(),
@@ -39,26 +37,21 @@ Future<void> example() async {
   );
 
   final QueryOptions options = QueryOptions(
-    operationName: 'ReadRepositories',
+    operationName: 'LoadPosts',
     document: gql(
       r'''
-        query ReadRepositories($nRepositories: Int!) {
-          viewer {
-            repositories(last: $nRepositories) {
-              nodes {
-                id
-                # this one is intentionally wrong, the last char 'e' is missing
-                nam
-                # this one is intentionally wrong, the last char 'd' is missing
-                viewerHasStarre
-              }
-            }
+        query LoadPosts($id: ID!) {
+          post(id: $id) {
+            id
+            # this one is intentionally wrong, the last char 'e' is missing
+            titl
+            body
           }
         }
       ''',
     ),
     variables: {
-      'nRepositories': 50,
+      'id': 50,
     },
   );
 

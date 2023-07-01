@@ -70,30 +70,14 @@ class SentryLinkHandler {
         },
       ));
     } else if (reportGraphQLErrors) {
-      final exceptions = errors.toSentryExceptions(request, response);
-      if (exceptions.isNotEmpty) {
-        // try to format it nicely
-        await hub.captureEvent(
-          SentryEvent(
-            exceptions: response.errors?.toSentryExceptions(request, response),
-            level: SentryLevel.error,
-          ),
-        );
-      } else {
-        // we couldn't format it nicely
-        await hub.captureEvent(
-          SentryEvent(
-            exceptions: response.errors?.toSentryExceptions(request, response),
-            level: SentryLevel.error,
-            contexts: Contexts()
-              ..['GraphQL'] = <String, dynamic>{
-                'request': request.toJson(),
-                'response': response.toJson(),
-              },
-          ),
-        );
-      }
+      final event = _eventFromRequestAndResponse(
+        request: request,
+        response: response,
+      );
+
+      await hub.captureEvent(event);
     }
+
     yield response;
   }
 
@@ -111,18 +95,54 @@ class SentryLinkHandler {
         data: request.toJson(),
       ));
     } else if (reportExceptions) {
-      await hub.captureException(
-        exception,
-        withScope: (scope) {
-          scope.setContexts(
-            'GraphQL',
-            <String, dynamic>{
-              'request': request.toJson(),
-            },
-          );
-        },
+      Response? response;
+      int? statusCode;
+      if (exception is ServerException) {
+        response = exception.parsedResponse;
+        statusCode = exception.statusCode;
+      }
+
+      final event = _eventFromRequestAndResponse(
+        request: request,
+        response: response,
+        statusCode: statusCode,
+        exception: exception,
       );
+
+      await hub.captureEvent(event);
     }
     yield* Stream.error(exception);
   }
+}
+
+SentryEvent _eventFromRequestAndResponse({
+  required Request request,
+  required Response? response,
+  int? statusCode,
+  Object? exception,
+}) {
+  final sentryRequest = request.toSentryRequest();
+  final operationName = request.operation.operationName ?? 'unnamed operation';
+  final type = request.type;
+
+  final sentryResponse = response?.toSentryResponse(statusCode);
+  ThrowableMechanism? throwableMechanism;
+  if (exception != null) {
+    final mechanism = Mechanism(
+      type: 'SentryLink',
+      handled: true,
+    );
+    throwableMechanism = ThrowableMechanism(mechanism, exception);
+  }
+
+  return SentryEvent(
+    message: SentryMessage('Error during $operationName'),
+    level: SentryLevel.error,
+    request: sentryRequest,
+    contexts: Contexts(response: sentryResponse),
+    fingerprint: [operationName, type.name, statusCode?.toString()]
+        .whereType<String>()
+        .toList(),
+    throwable: throwableMechanism,
+  );
 }
