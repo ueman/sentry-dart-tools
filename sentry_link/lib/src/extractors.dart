@@ -35,5 +35,5 @@ class ContextReadExceptionExtractor
 class ContextWriteExceptionExtractor
     extends LinkExceptionExtractor<ContextWriteException> {}
 
-class ServerExceptionExtractor extends LinkExceptionExtractor<ServerException> {
-}
+class ServerExceptionExtractor
+    extends LinkExceptionExtractor<ServerException> {}
