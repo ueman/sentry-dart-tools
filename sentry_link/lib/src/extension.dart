@@ -45,8 +45,9 @@ extension ResponseX on Response {
     };
   }
 
-  SentryResponse toSentryResponse() {
+  SentryResponse toSentryResponse(int? statusCode) {
     return SentryResponse(
+      statusCode: statusCode,
       data: {
         'errors': errors?.map((e) => e.toJson()).toList(),
         'data': data,

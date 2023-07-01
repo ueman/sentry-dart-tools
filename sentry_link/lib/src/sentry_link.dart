@@ -70,7 +70,7 @@ class SentryLinkHandler {
         },
       ));
     } else if (reportGraphQLErrors) {
-      final event = _eventFromRequestAndResponse(request, response);
+      final event = _eventFromRequestAndResponse(request, response, null);
 
       await hub.captureEvent(event);
     }
@@ -93,11 +93,17 @@ class SentryLinkHandler {
       ));
     } else if (reportExceptions) {
       Response? response;
+      int? statusCode;
       if (exception is ServerException) {
         response = exception.parsedResponse;
+        statusCode = exception.statusCode;
       }
 
-      final event = _eventFromRequestAndResponse(request, response);
+      final event = _eventFromRequestAndResponse(
+        request,
+        response,
+        statusCode,
+      );
 
       await hub.captureEvent(event);
     }
@@ -105,16 +111,24 @@ class SentryLinkHandler {
   }
 }
 
-SentryEvent _eventFromRequestAndResponse(Request request, Response? response) {
+SentryEvent _eventFromRequestAndResponse(
+  Request request,
+  Response? response,
+  int? statusCode,
+) {
   final sentryRequest = request.toSentryRequest();
   final operationName = request.operation.operationName ?? 'unnamed operation';
+  final type = request.type;
 
-  final sentryResponse = response?.toSentryResponse();
+  final sentryResponse = response?.toSentryResponse(statusCode);
 
   return SentryEvent(
     message: SentryMessage('Error during $operationName'),
     level: SentryLevel.error,
     request: sentryRequest,
     contexts: Contexts(response: sentryResponse),
+    fingerprint: [operationName, type.name, statusCode?.toString()]
+        .whereType<String>()
+        .toList(),
   );
 }
