@@ -70,7 +70,10 @@ class SentryLinkHandler {
         },
       ));
     } else if (reportGraphQLErrors) {
-      final event = _eventFromRequestAndResponse(request, response, null);
+      final event = _eventFromRequestAndResponse(
+        request: request,
+        response: response,
+      );
 
       await hub.captureEvent(event);
     }
@@ -100,9 +103,10 @@ class SentryLinkHandler {
       }
 
       final event = _eventFromRequestAndResponse(
-        request,
-        response,
-        statusCode,
+        request: request,
+        response: response,
+        statusCode: statusCode,
+        exception: exception,
       );
 
       await hub.captureEvent(event);
@@ -111,16 +115,25 @@ class SentryLinkHandler {
   }
 }
 
-SentryEvent _eventFromRequestAndResponse(
-  Request request,
-  Response? response,
+SentryEvent _eventFromRequestAndResponse({
+  required Request request,
+  required Response? response,
   int? statusCode,
-) {
+  Object? exception,
+}) {
   final sentryRequest = request.toSentryRequest();
   final operationName = request.operation.operationName ?? 'unnamed operation';
   final type = request.type;
 
   final sentryResponse = response?.toSentryResponse(statusCode);
+  ThrowableMechanism? throwableMechanism;
+  if (exception != null) {
+    final mechanism = Mechanism(
+      type: 'SentryLink',
+      handled: true,
+    );
+    throwableMechanism = ThrowableMechanism(mechanism, exception);
+  }
 
   return SentryEvent(
     message: SentryMessage('Error during $operationName'),
@@ -130,5 +143,6 @@ SentryEvent _eventFromRequestAndResponse(
     fingerprint: [operationName, type.name, statusCode?.toString()]
         .whereType<String>()
         .toList(),
+    throwable: throwableMechanism,
   );
 }
