@@ -1,6 +1,8 @@
 # Sentry for dart_frog
 
-This is an integration for [`dart_frog`](https://pub.dev/packages/dart_frog) to collect errors and automatically report them to Sentry.
+This is an integration for [`dart_frog`](https://pub.dev/packages/dart_frog) to collects errors and performance traces automatically.
+
+Learn more in this [article](https://medium.com/@jonasuekoetter/bridging-the-gap-distributed-tracing-for-flutter-and-backend-4943799b0ea9).
 
 > **Note**
 > This is experimental. Use at your own risk.

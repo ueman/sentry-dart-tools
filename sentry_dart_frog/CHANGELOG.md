@@ -1,3 +1,10 @@
+## 0.2.1
+
+- Add in-depth article about distributed tracing to readme
+- Don't add request body to error, as it may not be safe to read
+- Add more default app excludes
+- Add topics
+
 ## 0.2.0
 
 - Update to dart_frog: 1.0.0

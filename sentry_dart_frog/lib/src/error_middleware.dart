@@ -5,7 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 Handler sentryErrorMiddleware(Handler innerHandler) {
   return (context) async {
     try {
-      // if innerHandler isn't awaited, the error isn't caught by by try-catch
+      // If innerHandler isn't awaited, the error isn't caught by the try-catch
       return await innerHandler(context);
     } catch (exception, strackTrace) {
       final mechanism = Mechanism(
@@ -27,7 +27,7 @@ Handler sentryErrorMiddleware(Handler innerHandler) {
           cookies: context.request.headers['Cookies'],
           url: context.request.uri.path,
           queryString: context.request.url.query,
-          data: await context.request.body(),
+          fragment: context.request.url.fragment,
         ),
       );
       await Sentry.captureEvent(event, stackTrace: strackTrace);
