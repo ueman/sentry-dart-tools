@@ -44,8 +44,21 @@ Handler sentryPerformanceMiddleware(Handler innerHandler) {
             'http.client',
             bindToScope: true,
           );
+
+    trx.origin = 'auto.http.sentry_dart_frog';
+    trx.setData('http.method', context.request.method);
+    trx.setData('url', context.request.url);
+    trx.setData('http.query', context.request.url.query);
+    trx.setData('http.fragment', context.request.url.fragment);
+
     try {
       response = await innerHandler(context);
+
+      trx.setData('http.response.status_code', response.statusCode);
+      trx.setData(
+        'http.response_content_length',
+        _getContentLength(response.headers),
+      );
       trx.status = SpanStatus.fromHttpStatusCode(response.statusCode);
     } catch (e) {
       trx
@@ -57,4 +70,13 @@ Handler sentryPerformanceMiddleware(Handler innerHandler) {
     }
     return response;
   };
+}
+
+int? _getContentLength(Map<String, String> headers) {
+  final contentLengthHeader =
+      headers['content-length'] ?? headers['Content-Length'];
+  if (contentLengthHeader != null && contentLengthHeader.isNotEmpty) {
+    return int.tryParse(contentLengthHeader);
+  }
+  return null;
 }
