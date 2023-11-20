@@ -7,7 +7,7 @@ Handler sentryErrorMiddleware(Handler innerHandler) {
     try {
       // If innerHandler isn't awaited, the error isn't caught by the try-catch
       return await innerHandler(context);
-    } catch (exception, strackTrace) {
+    } catch (exception, stackTrace) {
       final mechanism = Mechanism(
         type: 'MiddlewareErrorHandler',
         handled: false,
@@ -30,7 +30,7 @@ Handler sentryErrorMiddleware(Handler innerHandler) {
           fragment: context.request.url.fragment,
         ),
       );
-      await Sentry.captureEvent(event, stackTrace: strackTrace);
+      await Sentry.captureEvent(event, stackTrace: stackTrace);
       rethrow;
     }
   };
