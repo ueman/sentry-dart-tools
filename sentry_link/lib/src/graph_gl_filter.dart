@@ -2,10 +2,10 @@ import 'package:sentry/sentry.dart';
 
 BeforeBreadcrumbCallback graphQlFilter([BeforeBreadcrumbCallback? filter]) {
   return (
-    Breadcrumb? ogBreadcrumb, {
-    Hint? hint,
-  }) {
-    final breadCrumb = filter?.call(ogBreadcrumb, hint: hint);
+    Breadcrumb? ogBreadcrumb,
+    Hint hint,
+  ) {
+    final breadCrumb = filter?.call(ogBreadcrumb, hint);
     if (breadCrumb == null) {
       return null;
     }
