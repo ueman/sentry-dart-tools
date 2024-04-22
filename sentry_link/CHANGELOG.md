@@ -1,3 +1,8 @@
+## 0.4.0
+
+- Require Dart 3
+- Update to Sentry v8.0.0
+
 ## 0.3.0
 
 - Proper support for GraphQL in Sentry. Sentry added proper support for GraphQL errors in with [#33723](https://github.com/getsentry/sentry/issues/33723) and this library now sends it as per spec.
