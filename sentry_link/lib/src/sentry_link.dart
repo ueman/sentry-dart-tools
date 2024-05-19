@@ -4,7 +4,7 @@ import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
 import 'package:sentry_link/src/extension.dart';
 
-/// Provides a `Link` which captures exceptions and GraphQL errors
+/// Provides a [Link] which captures exceptions and GraphQL errors
 class SentryLink {
   /// Provides a [Link] which captures exceptions and GraphQL errors.
   static ErrorLink link({
@@ -123,7 +123,7 @@ SentryEvent _eventFromRequestAndResponse({
 }) {
   final sentryRequest = request.toSentryRequest();
   final operationName = request.operation.operationName ?? 'unnamed operation';
-  final type = request.type;
+  final type = request.operation.getOperationType();
 
   final sentryResponse = response?.toSentryResponse(statusCode);
   ThrowableMechanism? throwableMechanism;
@@ -140,7 +140,7 @@ SentryEvent _eventFromRequestAndResponse({
     level: SentryLevel.error,
     request: sentryRequest,
     contexts: Contexts(response: sentryResponse),
-    fingerprint: [operationName, type.name, statusCode?.toString()]
+    fingerprint: [operationName, type?.name, statusCode?.toString()]
         .whereType<String>()
         .toList(),
     throwable: throwableMechanism,

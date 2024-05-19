@@ -5,7 +5,7 @@ import 'package:gql_exec/gql_exec.dart';
 import 'package:sentry/sentry.dart';
 import 'package:gql/language.dart' show printNode;
 
-extension GraphQLErrorX on GraphQLError {
+extension SentryGraphQLErrorExtension on GraphQLError {
   Map<String, dynamic> toJson() {
     return {
       'message': message,
@@ -17,7 +17,7 @@ extension GraphQLErrorX on GraphQLError {
   }
 }
 
-extension RequestX on Request {
+extension SentryRequestExtension on Request {
   Map<String, dynamic> toJson() {
     return {
       'operation': operation.toJson(),
@@ -37,7 +37,7 @@ extension RequestX on Request {
   }
 }
 
-extension ResponseX on Response {
+extension SentryResponseExtension on Response {
   Map<String, dynamic> toJson() {
     return {
       'errors': errors?.map((e) => e.toJson()).toList(),
@@ -56,7 +56,7 @@ extension ResponseX on Response {
   }
 }
 
-extension OperationX on Operation {
+extension SentryOperationExtension on Operation {
   Map<String, dynamic> toJson() {
     return {
       'name': operationName,
@@ -65,23 +65,29 @@ extension OperationX on Operation {
   }
 }
 
-// Can be removed when
-// https://github.com/gql-dart/gql/issues/360
-// is fixed.
-extension RequestTypeExtension on Request {
-  OperationType get type {
-    final definitions = operation.document.definitions
-        .whereType<OperationDefinitionNode>()
-        .toList();
-    if (definitions.length != 1 && operation.operationName != null) {
-      definitions.removeWhere(
-        (node) => node.name!.value != operation.operationName,
-      );
-    }
-
-    assert(definitions.length == 1);
-    return definitions.first.type;
+extension SentryOperationTypeExtension on OperationType {
+  /// See https://develop.sentry.dev/sdk/performance/span-operations/
+  String get sentryOperation {
+    return switch (this) {
+      OperationType.query => 'http.graphql.query',
+      OperationType.mutation => 'http.graphql.mutation',
+      OperationType.subscription => 'http.graphql.subscription',
+    };
   }
 
-  bool get isQuery => type == OperationType.query;
+  String get sentryType {
+    return switch (this) {
+      OperationType.query => 'query',
+      OperationType.mutation => 'mutation',
+      OperationType.subscription => 'subscription',
+    };
+  }
+
+  String get name {
+    return switch (this) {
+      OperationType.query => 'query',
+      OperationType.mutation => 'mutation',
+      OperationType.subscription => 'subscription',
+    };
+  }
 }

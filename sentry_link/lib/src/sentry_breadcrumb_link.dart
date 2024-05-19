@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:gql_exec/gql_exec.dart';
 import 'package:gql_link/gql_link.dart';
 import 'package:sentry/sentry.dart';
-import 'package:sentry_link/src/extension.dart';
 import 'package:sentry_link/src/sentry_link.dart';
+import 'package:sentry_link/src/extension.dart';
 
 /// Only handles success cases. Error cases are handled by [SentryLink].
 class SentryBreadcrumbLink extends Link {
@@ -20,10 +20,9 @@ class SentryBreadcrumbLink extends Link {
       'This is not a terminating link and needs a NextLink',
     );
 
-    final isQuery = request.isQuery;
-    final type = isQuery ? 'query' : 'mutation';
+    final operationType = request.operation.getOperationType()?.sentryType;
     final description =
-        'GraphQL: "${request.operation.operationName ?? 'unnamed'}" $type';
+        'GraphQL: "${request.operation.operationName ?? 'unnamed'}" $operationType';
 
     final stopwatch = Stopwatch()..start();
 
@@ -55,9 +54,7 @@ class SentryBreadcrumbLink extends Link {
       category: 'GraphQL',
       message: description,
       type: 'query',
-      data: {
-        'duration': duration.toString(),
-      },
+      data: {'duration': duration.toString()},
     ));
   }
 }

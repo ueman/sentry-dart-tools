@@ -1,3 +1,9 @@
+## 0.5.0
+
+- Require `gql_exec: ">=0.4.4 <2.0.0"`
+- Remove newly unused code
+- Export a couple extension methods to help converting requests and responses to their Sentry equivalents
+
 ## 0.4.0
 
 - Require Dart 3

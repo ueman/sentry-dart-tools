@@ -40,15 +40,13 @@ class SentryTracingLink extends Link {
       'This is not a terminating link and needs a NextLink',
     );
 
-    final isQuery = request.isQuery;
-
-    // See https://develop.sentry.dev/sdk/performance/span-operations/
-    final operation = isQuery ? 'http.graphql.query' : 'http.graphql.mutation';
-    final type = isQuery ? 'query' : 'mutation';
+    final operationType = request.operation.getOperationType();
+    final sentryOperation = operationType?.sentryOperation ?? 'unknown';
+    final sentryType = operationType?.sentryType;
 
     final transaction = _startSpan(
-      'GraphQL: "${request.operation.operationName ?? 'unnamed'}" $type',
-      operation,
+      'GraphQL: "${request.operation.operationName ?? 'unnamed'}" $sentryType',
+      sentryOperation,
       shouldStartTransaction,
     );
     return forward!(request).transform(StreamTransformer.fromHandlers(
