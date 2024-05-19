@@ -1,3 +1,7 @@
+## 0.5.1
+
+- Fix various pub score issues
+
 ## 0.5.0
 
 - Require `gql_exec: ">=0.4.4 <2.0.0"`

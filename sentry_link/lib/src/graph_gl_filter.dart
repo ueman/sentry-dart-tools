@@ -5,7 +5,8 @@ BeforeBreadcrumbCallback graphQlFilter([BeforeBreadcrumbCallback? filter]) {
     Breadcrumb? ogBreadcrumb,
     Hint hint,
   ) {
-    final breadCrumb = (filter != null) ? filter.call(ogBreadcrumb, hint) : ogBreadcrumb;
+    final breadCrumb =
+        (filter != null) ? filter.call(ogBreadcrumb, hint) : ogBreadcrumb;
     if (breadCrumb == null) {
       return null;
     }

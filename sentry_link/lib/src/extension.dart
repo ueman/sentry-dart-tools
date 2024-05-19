@@ -5,6 +5,7 @@ import 'package:gql_exec/gql_exec.dart';
 import 'package:sentry/sentry.dart';
 import 'package:gql/language.dart' show printNode;
 
+/// Extension for [GraphQLError]
 extension SentryGraphQLErrorExtension on GraphQLError {
   Map<String, dynamic> toJson() {
     return {
@@ -17,6 +18,7 @@ extension SentryGraphQLErrorExtension on GraphQLError {
   }
 }
 
+/// Extension for [Request]
 extension SentryRequestExtension on Request {
   Map<String, dynamic> toJson() {
     return {
@@ -37,6 +39,7 @@ extension SentryRequestExtension on Request {
   }
 }
 
+/// Extension for [Response]
 extension SentryResponseExtension on Response {
   Map<String, dynamic> toJson() {
     return {
@@ -56,6 +59,7 @@ extension SentryResponseExtension on Response {
   }
 }
 
+/// Extension for [Operation]
 extension SentryOperationExtension on Operation {
   Map<String, dynamic> toJson() {
     return {
@@ -65,6 +69,7 @@ extension SentryOperationExtension on Operation {
   }
 }
 
+/// Extension for [OperationType]
 extension SentryOperationTypeExtension on OperationType {
   /// See https://develop.sentry.dev/sdk/performance/span-operations/
   String get sentryOperation {
@@ -89,5 +94,14 @@ extension SentryOperationTypeExtension on OperationType {
       OperationType.mutation => 'mutation',
       OperationType.subscription => 'subscription',
     };
+  }
+}
+
+/// Extension for [SentryOptions]
+extension InAppExclueds on SentryOptions {
+  /// Sets this library as not in-app frames, to improve stack trace
+  /// presentation in Sentry.
+  void addSentryLinkInAppExcludes() {
+    addInAppExclude('sentry_link');
   }
 }
